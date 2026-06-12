@@ -1,0 +1,75 @@
+# Documented Assumptions
+
+This file records every judgment call made during implementation — what was
+assumed, why, and what we'd do differently with more time. Per
+`coding-standards.md`, this feeds directly into the architecture document
+and the demo video.
+
+---
+
+## LLM model selection
+**Assumption:** Use `claude-sonnet-4-5` for document extraction/reasoning (vision-capable,
+supports multi-modal input) and `claude-haiku-4-5` for lightweight document-type
+classification (cheaper and faster for simple tasks).
+
+**Why:** Extraction needs high accuracy on messy real-world documents; classification
+is a simpler task that doesn't justify the cost of Sonnet. Both are in the
+`claude-sonnet-4-x` / `claude-haiku-4-x` families specified in tech-stack.md.
+
+**Would change:** Benchmark both models on a held-out document set to validate the
+cost/accuracy tradeoff before committing to the split.
+
+---
+
+## MANUAL_REVIEW confidence threshold
+**Assumption:** `MANUAL_REVIEW_CONFIDENCE_THRESHOLD = 0.60`
+
+**Why:** A 60% confidence floor gives the system room to approve high-confidence
+claims while routing genuinely ambiguous ones (multiple degraded documents,
+borderline policy matches) to manual review. Chosen as a starting point to be
+calibrated against the eval test results from `test_cases.json`.
+
+**Would change:** Run the 12 test cases and adjust the threshold to minimise
+false MANUAL_REVIEW outcomes while keeping all borderline cases routed correctly.
+
+---
+
+## Confidence penalty weights
+**Assumption:**
+- Degraded extraction (overall_confidence=0.0, is_partial=True): **−0.30** per document
+- Partial extraction (0 < overall_confidence < 0.5, is_partial=True): **−0.15** per document
+- Ambiguous/borderline policy check (e.g. fuzzy exclusion match with low confidence): **−0.10** per check
+
+**Why:** Missing the primary bill amount is more damaging than a missing doctor name.
+These weights are rough but documented so they can be tuned against the eval data.
+
+**Would change:** Assign different weights to different missing fields (e.g.
+`amount` > `diagnosis` > `doctor_name`) rather than a flat per-document penalty.
+
+---
+
+## simulate_component_failure target component
+**Assumption:** When `simulate_component_failure=True`, the **Extraction Agent** for
+the first uploaded document is forced into its degraded path. The orchestrator
+detects the flag and passes `force_degraded=True` to that extraction call only.
+
+**Why:** TC011 expects `APPROVED` with lower confidence — forcing extraction degradation
+is more realistic than forcing fraud-check degradation (which would produce MANUAL_REVIEW
+instead of APPROVED). Extraction degradation reduces confidence but the policy checks
+can still pass and produce an APPROVED outcome.
+
+**Would change:** Make the targeted component configurable in the flag payload
+(e.g. `{"simulate_component_failure": "extraction"}`) for more precise test control.
+
+---
+
+## Corrupted/unopenable file handling
+**Assumption:** Corrupted or unopenable files (e.g. truncated PDF, unsupported format)
+are mapped to `VerificationFailureType.UNREADABLE_DOCUMENT` — not a separate enum value.
+
+**Why:** The enum has three values exactly as defined in `data-contracts.md`. The
+error-handling spec describes this case as "a missing-document case with a specific
+message" — UNREADABLE_DOCUMENT is the closest semantic fit and keeps the enum minimal.
+
+**Would change:** A fourth `CORRUPTED_FILE` type would make the distinction clearer
+in the trace/message; worth adding if ops feedback shows confusion between the two.
