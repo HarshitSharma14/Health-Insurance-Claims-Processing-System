@@ -7,6 +7,7 @@ from app.schemas.claim import (
     ClaimCategory,
     ClaimsHistoryEntry,
     ClaimSubmission,
+    DocumentQuality,
     DocumentType,
     UploadedDocument,
 )
@@ -26,6 +27,7 @@ __all__ = [
     "ClaimCategory",
     "ClaimsHistoryEntry",
     "ClaimSubmission",
+    "DocumentQuality",
     "DocumentType",
     "UploadedDocument",
     # verification

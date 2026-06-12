@@ -8,7 +8,7 @@ Design: ClaimTrace is passed by reference through the pipeline — each agent
 receives it, appends its events, and returns. No global state is used.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Literal
 
 from app.schemas.trace import ClaimTrace, TraceEvent
@@ -41,7 +41,7 @@ def append_event(
     event = TraceEvent(
         stage=stage,
         component=component,
-        timestamp=timestamp or datetime.utcnow(),
+        timestamp=timestamp or datetime.now(tz=timezone.utc),
         status=status,
         summary=summary,
         details=details or {},

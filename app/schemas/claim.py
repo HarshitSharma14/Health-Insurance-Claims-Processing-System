@@ -38,13 +38,38 @@ class DocumentType(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
+class DocumentQuality(str, Enum):
+    """Scan/photo quality as assessed during pre-classification.
+
+    GOOD        — document is readable; proceed normally.
+    UNREADABLE  — document cannot be read (blurry, corrupted, blank, wrong format).
+                  Triggers VerificationFailureType.UNREADABLE_DOCUMENT.
+    UNKNOWN     — quality not yet assessed (default before classification runs).
+    """
+
+    GOOD = "GOOD"
+    UNREADABLE = "UNREADABLE"
+    UNKNOWN = "UNKNOWN"
+
+
 class UploadedDocument(BaseModel):
-    """A single document attached to a claim submission."""
+    """A single document attached to a claim submission.
+
+    document_type: pre-classified type (set by lightweight LLM classification
+                   step before Stage 0, or supplied directly in tests via
+                   actual_type). Defaults to UNKNOWN if classification hasn't run.
+    quality:       scan quality; UNREADABLE triggers the legibility check failure.
+    patient_name:  patient name extracted from or printed on the document.
+                   Used by the cross-document identity check (Stage 0, check 3).
+    """
 
     file_id: str
     file_name: str | None = None
     content_type: str | None = None  # e.g. image/jpeg, application/pdf
     file_bytes: bytes | None = None  # raw bytes; use None when storing a reference
+    document_type: DocumentType = DocumentType.UNKNOWN  # set by pre-classification
+    quality: DocumentQuality = DocumentQuality.UNKNOWN
+    patient_name: str | None = None  # extracted / printed patient name on document
 
 
 class ClaimsHistoryEntry(BaseModel):
