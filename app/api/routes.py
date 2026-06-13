@@ -29,7 +29,7 @@ import asyncio
 import base64
 
 import google.generativeai as genai
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -182,6 +182,7 @@ app.add_middleware(
     summary="Submit a claim (multipart form with file uploads)",
 )
 async def submit_claim(
+    request: Request,
     member_id: str = Form(...),
     policy_id: str = Form(...),
     claim_category: ClaimCategory = Form(...),
@@ -191,24 +192,46 @@ async def submit_claim(
     simulate_component_failure: bool = Form(False),
     files: list[UploadFile] = File(..., description="One or more claim documents"),
 ) -> PipelineResponse:
-    """Process a claim submitted as multipart form data with document uploads."""
-    # Read all files first
+    """Process a claim submitted as multipart form data with document uploads.
+
+    Accepts optional document_type_{i} form fields (where i is the 0-based file index)
+    to declare the document type at upload time. When provided, LLM classification is
+    skipped for that file — the declared type is used directly. Falls back to Gemini
+    classification when no declared type is given for a file.
+    """
+    # Read declared document types from variable form fields (document_type_0, _1, ...)
+    form_data = await request.form()
+    declared_types: dict[int, DocumentType] = {}
+    for i in range(len(files)):
+        raw = form_data.get(f"document_type_{i}")
+        if raw:
+            try:
+                declared_types[i] = DocumentType(str(raw))
+            except ValueError:
+                pass  # ignore invalid values — fall back to classification
+
+    # Read all files
     raw_uploads = []
     for upload in files:
         content = await upload.read()
         raw_uploads.append((upload.filename, upload.content_type, content))
 
-    # Classify all documents concurrently before verification
-    doc_types = await asyncio.gather(*[
-        _classify_document(content, ct or "image/jpeg")
-        for _, ct, content in raw_uploads
-    ])
+    # Classify only files without a declared type
+    classify_indices = [i for i in range(len(raw_uploads)) if i not in declared_types]
+    classified: list[DocumentType] = []
+    if classify_indices:
+        classified = list(await asyncio.gather(*[
+            _classify_document(raw_uploads[i][2], raw_uploads[i][1] or "image/jpeg")
+            for i in classify_indices
+        ]))
+    classify_map = dict(zip(classify_indices, classified))
 
     documents: list[UploadedDocument] = []
-    for (fname, ct, content), doc_type in zip(raw_uploads, doc_types):
+    for i, (fname, ct, content) in enumerate(raw_uploads):
+        doc_type = declared_types.get(i) or classify_map.get(i, DocumentType.UNKNOWN)
         documents.append(
             UploadedDocument(
-                file_id=fname or f"upload_{len(documents)}",
+                file_id=fname or f"upload_{i}",
                 file_name=fname,
                 content_type=ct,
                 file_bytes=content,
