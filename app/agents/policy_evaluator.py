@@ -74,7 +74,10 @@ _CONDITION_KEYWORDS: dict[str, list[str]] = {
                       "anxiety disorder", "schizophrenia"],
     "obesity_treatment": ["obesity", "obese", "bariatric", "weight loss program",
                           "weight management"],
-    "hernia": ["hernia", "herniation"],
+    # "hernia" waiting period covers abdominal hernia surgery, NOT spinal
+    # disc herniation (TC007 diagnosis: "Suspected Lumbar Disc Herniation").
+    # Use word-boundary-aware patterns via the _text_matches_condition helper.
+    "hernia": ["hernia"],
     "cataract": ["cataract"],
 }
 
@@ -121,6 +124,26 @@ def _normalise(text: str) -> str:
 def _text_contains_any(text: str, keywords: list[str]) -> bool:
     t = _normalise(text)
     return any(kw.lower() in t for kw in keywords)
+
+
+# Conditions where a keyword match must NOT fire if certain context words are present.
+# This prevents "Lumbar Disc Herniation" from matching the hernia waiting period.
+_CONDITION_NEGATIVE_CONTEXT: dict[str, list[str]] = {
+    "hernia": ["disc herniation", "lumbar disc", "cervical disc", "disc hernia",
+               "spinal disc", "intervertebral disc"],
+}
+
+
+def _condition_matches(text: str, condition: str, keywords: list[str]) -> bool:
+    """Return True if text matches a condition keyword but NOT a negative-context term."""
+    t = _normalise(text)
+    if not any(kw.lower() in t for kw in keywords):
+        return False
+    # Check negative context — if any exclusion phrase is present, no match
+    for excl in _CONDITION_NEGATIVE_CONTEXT.get(condition, []):
+        if excl.lower() in t:
+            return False
+    return True
 
 
 def _collect_diagnosis_text(extractions: list[ExtractedDocumentData]) -> str:
@@ -282,7 +305,7 @@ def _stage2_waiting_period(
         for condition, keywords in _CONDITION_KEYWORDS.items():
             if condition not in specific:
                 continue
-            if _text_contains_any(diag_text, keywords):
+            if _condition_matches(diag_text, condition, keywords):
                 matched_condition = condition
                 matched_days = specific[condition]
                 break  # first match wins

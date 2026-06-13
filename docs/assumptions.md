@@ -117,3 +117,12 @@ in the trace/message; worth adding if ops feedback shows confusion between the t
 **Assumption:** `app/schemas/extraction.py` imports `datetime.date` as `date_type` (not `date`) to avoid a Pydantic v2 annotation resolution bug. When a field is named `date`, Pydantic resolves the class-level annotation `Optional[date]` in the class namespace where `date` refers to the field descriptor, not the `datetime.date` type, resolving to `NoneType`. Renaming the import to `date_type` fixes this without changing any external interface.
 
 ---
+
+## Hernia waiting period: disc herniation exclusion
+**Assumption:** The `hernia` waiting period (365 days) covers abdominal hernia surgery. "Lumbar Disc Herniation" / "disc herniation" must NOT trigger this waiting period — it is a spinal condition, not an abdominal hernia. Implemented via `_CONDITION_NEGATIVE_CONTEXT` in `policy_evaluator.py`: if any of the negative-context phrases (`"disc herniation"`, `"lumbar disc"`, etc.) appear in the diagnosis text alongside `"hernia"`, the condition match is suppressed.
+
+**Why:** TC007 (MRI for Lumbar Disc Herniation) expects `PRE_AUTH_MISSING`, not `WAITING_PERIOD`. Without this exclusion, "herniation" in the diagnosis string matched the hernia keyword, incorrectly firing the 365-day waiting period before the pre-auth check could run. EMP007 joined 2024-04-01 and treated 2024-11-02 (215 days) — within the hernia window.
+
+**Would change:** Replace keyword matching with an LLM-based semantic classifier that understands clinical context and would correctly distinguish abdominal hernia from disc herniation.
+
+---
