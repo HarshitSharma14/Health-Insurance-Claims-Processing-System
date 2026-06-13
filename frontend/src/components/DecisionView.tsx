@@ -12,20 +12,24 @@ export function DecisionView({ result, onNewClaim }: Props) {
   return (
     <div>
       {result.type === "verification_failure" ? (
-        <VerificationFailureView data={result.data as DocumentVerificationResult} />
+        <div className="px-5 py-5">
+          <VerificationFailureView data={result.data as DocumentVerificationResult} />
+        </div>
       ) : (
         <>
-          <DecisionSummary data={result.data as ClaimDecision} />
-          <div className="border-t border-border pt-6">
+          <div className="px-5 py-5">
+            <DecisionSummary data={result.data as ClaimDecision} />
+          </div>
+          <div className="border-t border-border px-5 py-5">
             <TraceTimeline trace={(result.data as ClaimDecision).trace} />
           </div>
         </>
       )}
 
-      <div className="mt-8 pt-5 border-t border-border">
+      <div className="border-t border-border px-5 py-3">
         <button
           onClick={onNewClaim}
-          className="text-sm text-accent hover:text-accent-hover font-medium transition-colors"
+          className="text-xs text-text-secondary hover:text-accent font-medium transition-colors"
         >
           ← Submit another claim
         </button>

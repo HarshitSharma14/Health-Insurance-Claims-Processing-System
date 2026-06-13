@@ -4,6 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Paper grain texture ──────────────────────────────────────────────────── */
+/* SVG noise at ~2.5% opacity — reads as physical document stock              */
 @layer base {
   html {
     background-color: #F7F5F2;
@@ -12,26 +14,84 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Tabular figures for all numbers in serif contexts */
-  .font-serif {
-    font-variant-numeric: tabular-nums;
+  body {
+    position: relative;
   }
 
-  /* Amounts / claim values always tabular */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* Ensure content sits above texture */
+  #root { position: relative; z-index: 1; }
+
+  /* Tabular figures for serif / mono number contexts */
+  .font-serif, .font-mono { font-variant-numeric: tabular-nums; }
   .tabular { font-variant-numeric: tabular-nums; }
 }
 
+/* ── Input focus: amber underline, no ring ────────────────────────────────── */
+@layer base {
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  textarea {
+    @apply focus:outline-none;
+    border-bottom-color: transparent;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  input[type="date"]:focus,
+  textarea:focus {
+    border-color: #B45309 !important;
+    box-shadow: 0 2px 0 -1px #B45309;
+  }
+}
+
+/* ── Utility classes ──────────────────────────────────────────────────────── */
 @layer components {
   .label {
-    @apply text-xs font-sans font-medium tracking-widest uppercase text-text-secondary;
+    @apply text-[10px] font-sans font-semibold tracking-[0.12em] uppercase text-text-secondary;
   }
 
   .policy-ref {
-    @apply font-mono text-xs bg-bg px-1.5 py-0.5 rounded text-text-secondary border border-border;
+    @apply font-mono text-[10px] bg-bg px-1.5 py-0.5 rounded text-text-secondary border border-border;
   }
 
-  .status-dot-ok       { @apply w-2 h-2 rounded-full bg-ok flex-shrink-0; }
-  .status-dot-warn     { @apply w-2 h-2 rounded-full bg-warn flex-shrink-0; }
-  .status-dot-fail     { @apply w-2 h-2 rounded-full bg-fail flex-shrink-0; }
+  .status-dot-ok       { @apply w-2 h-2 rounded-full bg-ok       flex-shrink-0; }
+  .status-dot-warn     { @apply w-2 h-2 rounded-full bg-warn     flex-shrink-0; }
+  .status-dot-fail     { @apply w-2 h-2 rounded-full bg-fail     flex-shrink-0; }
   .status-dot-degraded { @apply w-2 h-2 rounded-full bg-degraded flex-shrink-0; }
+
+  /* Staggered fade-up for form sections */
+  .section-1 { animation: fade-up 0.22s ease-out 0ms    both; }
+  .section-2 { animation: fade-up 0.22s ease-out 70ms   both; }
+  .section-3 { animation: fade-up 0.22s ease-out 140ms  both; }
+  .section-4 { animation: fade-up 0.22s ease-out 210ms  both; }
+
+  /* Staggered fade-up for trace events (applied inline via style) */
+  .trace-event { animation: fade-up 0.22s ease-out both; }
+}
+
+/* ── Stamp clip path ──────────────────────────────────────────────────────── */
+/* Slightly irregular polygon to simulate inked rubber stamp edges             */
+.stamp-clip {
+  clip-path: polygon(
+    1%  3%,
+    4%  0%,
+    97% 1%,
+    100% 2%,
+    99% 97%,
+    96% 100%,
+    3%  99%,
+    0%  98%
+  );
 }
