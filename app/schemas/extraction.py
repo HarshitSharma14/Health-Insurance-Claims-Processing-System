@@ -4,7 +4,7 @@ Matches ExtractedDocumentData in data-contracts.md.
 One instance is produced per uploaded document (calls run concurrently).
 """
 
-from datetime import date
+from datetime import date as date_type
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -40,7 +40,7 @@ class ExtractedDocumentData(BaseModel):
     doctor_name: Optional[str] = None
     doctor_registration: Optional[str] = None
     hospital_name: Optional[str] = None
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     line_items: list[LineItem] = []
     total: Optional[float] = None
     tests_ordered: list[str] = []
