@@ -3,59 +3,67 @@ export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     fontFamily: {
-      serif: ['"IBM Plex Serif"', 'Georgia', 'serif'],
-      sans:  ['"IBM Plex Sans"',  'system-ui', 'sans-serif'],
-      mono:  ['"IBM Plex Mono"',  'Menlo', 'monospace'],
+      // GT Alpina Standard → Fraunces (optical-size serif, italic support)
+      serif: ['"Fraunces"', 'Georgia', 'serif'],
+      // Passengersans → Sora (clean, slightly rounded geometric sans)
+      sans:  ['"Sora"', 'system-ui', 'sans-serif'],
+      // IBM Plex Mono: IDs, policy clauses, claim refs
+      mono:  ['"IBM Plex Mono"', 'Menlo', 'monospace'],
     },
     extend: {
       colors: {
-        // Dark ink — header background, segmented-control active
-        ink:           "#1A1714",
-        "ink-light":   "#2C2826",
-        "ink-muted":   "#4A4441",
+        // ── Plum brand (extracted from plumhq.com CSS tokens) ──────────
+        aubergine:       "#2c0b21",   // --dark-1 / --esops-primary
+        "aubergine-deep":"#1d0716",   // --nav--nav-dark (hover/borders)
+        "aubergine-mid": "#3a0e2b",   // --dark-2 (elevated surfaces on dark bg)
 
-        // Page surfaces
-        bg:            "#F7F5F2",
-        surface:       "#FFFFFF",
-        border:        "#E2DDD8",
-        "border-strong":"#C8C2BB",
+        paper:           "#fffaf2",   // body background (rgb 255,250,242)
+        cream:           "#fff1e5",   // --light-0 / nav-white / text on dark
+        "cream-mid":     "#ffe4cc",   // --plum-promise-4 (subtle tints)
 
-        // Text
-        "text-primary":   "#1A1714",
-        "text-secondary": "#6B6560",
-        "text-muted":     "#A39D98",
+        coral:           "#ff4052",   // --esops-tertiary (CTA / primary accent)
+        "coral-hover":   "#e6293c",   // darker for hover states
 
-        // Accent — amber-brown
-        accent:          "#B45309",
-        "accent-hover":  "#92400E",
-        "accent-subtle": "#F0E6D8",
+        // Page text (on paper background)
+        "ink":           "#460932",   // rgb(70,9,50) — body text on cream/paper
+        "ink-light":     "#7a3060",   // secondary text (derived)
+        "ink-muted":     "#bea0b3",   // --plum-vision-light (muted/placeholder)
 
-        // Status (muted)
-        ok:              "#4A7C59",
-        "ok-bg":         "#EBF3EE",
-        warn:            "#92610A",
-        "warn-bg":       "#FDF3DC",
-        fail:            "#8B3A3A",
-        "fail-bg":       "#FAEBEB",
-        degraded:        "#4A6275",
-        "degraded-bg":   "#EBF0F3",
+        // ── Surface & border ─────────────────────────────────────────────
+        surface:         "#ffffff",
+        border:          "#f0e4d8",   // subtle warm border on paper
+        "border-strong": "#d9c4b8",   // stronger border
+
+        // ── Status palette (derived from Plum's world) ────────────────────
+        // APPROVED  — muted sage/teal (cool counterpoint to warm palette)
+        ok:              "#4e7d6a",
+        "ok-bg":         "#eaf2ee",
+        // PARTIAL   — warm gold/ochre between cream and coral
+        warn:            "#c49428",
+        "warn-bg":       "#fdf4d6",
+        // REJECTED  — coral direct (brand CTA = stop signal, coherent)
+        fail:            "#ff4052",
+        "fail-bg":       "#fff0f1",
+        // MANUAL_REVIEW / degraded — dusty mauve, lighter than aubergine
+        degraded:        "#9c7a94",
+        "degraded-bg":   "#f5eef4",
       },
 
       keyframes: {
         "fade-up": {
-          "0%":   { opacity: "0", transform: "translateY(8px)" },
+          "0%":   { opacity: "0", transform: "translateY(6px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "stamp-press": {
           "0%":   { opacity: "0", transform: "rotate(-3deg) scale(1.18)" },
-          "60%":  { opacity: "1", transform: "rotate(-3deg) scale(0.97)" },
-          "80%":  { transform: "rotate(-3deg) scale(1.01)" },
+          "55%":  { opacity: "1", transform: "rotate(-3deg) scale(0.96)" },
+          "78%":  { transform: "rotate(-3deg) scale(1.02)" },
           "100%": { opacity: "1", transform: "rotate(-3deg) scale(1)" },
         },
       },
       animation: {
         "fade-up":     "fade-up 0.22s ease-out both",
-        "stamp-press": "stamp-press 0.18s cubic-bezier(0.22,1,0.36,1) both",
+        "stamp-press": "stamp-press 0.2s cubic-bezier(0.22,1,0.36,1) both",
       },
     },
   },

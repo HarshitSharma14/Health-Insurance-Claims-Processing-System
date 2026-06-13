@@ -1,21 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;500;600&display=swap');
+/* Fraunces: optical-size serif, italic support (GT Alpina approx) */
+/* Sora: clean rounded geometric sans (Passengersans approx) */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,600&family=Sora:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Paper grain texture ──────────────────────────────────────────────────── */
-/* SVG noise at ~2.5% opacity — reads as physical document stock              */
+/* ── Paper grain ───────────────────────────────────────────────────────────── */
 @layer base {
   html {
-    background-color: #F7F5F2;
-    color: #1A1714;
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    background-color: #fffaf2;
+    color: #460932;
+    font-family: 'Sora', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
-  }
-
-  body {
-    position: relative;
   }
 
   body::before {
@@ -24,74 +21,67 @@
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.028;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.022;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 200px 200px;
   }
 
-  /* Ensure content sits above texture */
   #root { position: relative; z-index: 1; }
 
-  /* Tabular figures for serif / mono number contexts */
   .font-serif, .font-mono { font-variant-numeric: tabular-nums; }
   .tabular { font-variant-numeric: tabular-nums; }
 }
 
-/* ── Input focus: amber underline, no ring ────────────────────────────────── */
+/* ── Focus: coral underline, no default ring ───────────────────────────────── */
 @layer base {
   input[type="text"],
   input[type="number"],
   input[type="date"],
   textarea {
     @apply focus:outline-none;
-    border-bottom-color: transparent;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
   input[type="text"]:focus,
   input[type="number"]:focus,
   input[type="date"]:focus,
   textarea:focus {
-    border-color: #B45309 !important;
-    box-shadow: 0 2px 0 -1px #B45309;
+    border-color: #ff4052 !important;
+    box-shadow: 0 2px 0 -1px #ff4052;
   }
 }
 
-/* ── Utility classes ──────────────────────────────────────────────────────── */
+/* ── Utility classes ───────────────────────────────────────────────────────── */
 @layer components {
+  /* Small-caps section labels */
   .label {
-    @apply text-[10px] font-sans font-semibold tracking-[0.12em] uppercase text-text-secondary;
+    @apply text-[10px] font-sans font-semibold tracking-[0.13em] uppercase text-ink-muted;
   }
 
+  /* Policy clause monospace badges */
   .policy-ref {
-    @apply font-mono text-[10px] bg-bg px-1.5 py-0.5 rounded text-text-secondary border border-border;
+    @apply font-mono text-[10px] bg-paper px-1.5 py-0.5 rounded text-ink-muted border border-border;
   }
 
+  /* Status dots */
   .status-dot-ok       { @apply w-2 h-2 rounded-full bg-ok       flex-shrink-0; }
   .status-dot-warn     { @apply w-2 h-2 rounded-full bg-warn     flex-shrink-0; }
   .status-dot-fail     { @apply w-2 h-2 rounded-full bg-fail     flex-shrink-0; }
   .status-dot-degraded { @apply w-2 h-2 rounded-full bg-degraded flex-shrink-0; }
 
-  /* Staggered fade-up for form sections */
-  .section-1 { animation: fade-up 0.22s ease-out 0ms    both; }
-  .section-2 { animation: fade-up 0.22s ease-out 70ms   both; }
-  .section-3 { animation: fade-up 0.22s ease-out 140ms  both; }
-  .section-4 { animation: fade-up 0.22s ease-out 210ms  both; }
+  /* Staggered form section reveals */
+  .section-1 { animation: fade-up 0.22s ease-out 0ms   both; }
+  .section-2 { animation: fade-up 0.22s ease-out 70ms  both; }
+  .section-3 { animation: fade-up 0.22s ease-out 140ms both; }
+  .section-4 { animation: fade-up 0.22s ease-out 210ms both; }
 
-  /* Staggered fade-up for trace events (applied inline via style) */
+  /* Trace event stagger (delay applied inline) */
   .trace-event { animation: fade-up 0.22s ease-out both; }
 }
 
-/* ── Stamp clip path ──────────────────────────────────────────────────────── */
-/* Slightly irregular polygon to simulate inked rubber stamp edges             */
+/* ── Stamp clip ────────────────────────────────────────────────────────────── */
 .stamp-clip {
   clip-path: polygon(
-    1%  3%,
-    4%  0%,
-    97% 1%,
-    100% 2%,
-    99% 97%,
-    96% 100%,
-    3%  99%,
-    0%  98%
+    1%  3%, 4%  0%, 97% 1%, 100% 2%,
+    99% 97%, 96% 100%, 3% 99%, 0% 98%
   );
 }

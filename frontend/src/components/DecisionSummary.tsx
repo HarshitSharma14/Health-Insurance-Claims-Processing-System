@@ -1,50 +1,41 @@
 import type { ClaimDecision, DecisionOutcome, FinancialBreakdown, LineItemEvaluation } from "../types";
 
-// ── Outcome metadata ──────────────────────────────────────────────────────────
-
 const OUTCOME: Record<DecisionOutcome, {
   label: string;
-  textColor: string;
-  borderColor: string;
-  bgColor: string;
-  stampBorder: string;  // CSS border color for stamp
-  stampBg: string;      // stamp background (very low opacity)
+  color: string;       // stamp border + text color
+  bgColor: string;     // stamp interior (very low opacity)
+  borderLeft: string;  // reason text border
+  tagBorder: string;   // rejection reason tags
 }> = {
   APPROVED: {
-    label: "APPROVED",
-    textColor:   "text-ok",
-    borderColor: "border-ok",
-    bgColor:     "bg-ok-bg",
-    stampBorder: "#4A7C59",
-    stampBg:     "rgba(74,124,89,0.07)",
+    label:      "APPROVED",
+    color:      "#4e7d6a",
+    bgColor:    "rgba(78,125,106,0.07)",
+    borderLeft: "border-ok",
+    tagBorder:  "border-ok text-ok",
   },
   PARTIAL: {
-    label: "PARTIAL",
-    textColor:   "text-warn",
-    borderColor: "border-warn",
-    bgColor:     "bg-warn-bg",
-    stampBorder: "#92610A",
-    stampBg:     "rgba(146,97,10,0.07)",
+    label:      "PARTIAL",
+    color:      "#c49428",
+    bgColor:    "rgba(196,148,40,0.07)",
+    borderLeft: "border-warn",
+    tagBorder:  "border-warn text-warn",
   },
   REJECTED: {
-    label: "REJECTED",
-    textColor:   "text-fail",
-    borderColor: "border-fail",
-    bgColor:     "bg-fail-bg",
-    stampBorder: "#8B3A3A",
-    stampBg:     "rgba(139,58,58,0.07)",
+    label:      "REJECTED",
+    color:      "#ff4052",
+    bgColor:    "rgba(255,64,82,0.06)",
+    borderLeft: "border-fail",
+    tagBorder:  "border-fail text-fail",
   },
   MANUAL_REVIEW: {
-    label: "MANUAL REVIEW",
-    textColor:   "text-degraded",
-    borderColor: "border-degraded",
-    bgColor:     "bg-degraded-bg",
-    stampBorder: "#4A6275",
-    stampBg:     "rgba(74,98,117,0.07)",
+    label:      "MANUAL REVIEW",
+    color:      "#9c7a94",
+    bgColor:    "rgba(156,122,148,0.07)",
+    borderLeft: "border-degraded",
+    tagBorder:  "border-degraded text-degraded",
   },
 };
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function fmt(n: number) {
   return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -58,15 +49,15 @@ function DecisionStamp({ outcome }: { outcome: DecisionOutcome }) {
     <div
       className="animate-stamp-press stamp-clip inline-flex items-center justify-center px-5 py-2.5"
       style={{
-        transform: "rotate(-3deg)",
-        background: o.stampBg,
-        border: `2.5px solid ${o.stampBorder}`,
+        transform:       "rotate(-3deg)",
+        background:      o.bgColor,
+        border:          `2.5px solid ${o.color}`,
         transformOrigin: "center center",
       }}
     >
       <span
-        className="font-mono font-semibold tracking-[0.2em] uppercase select-none"
-        style={{ color: o.stampBorder, fontSize: "15px", letterSpacing: "0.22em" }}
+        className="font-mono font-semibold uppercase select-none"
+        style={{ color: o.color, fontSize: "14px", letterSpacing: "0.22em" }}
       >
         {o.label}
       </span>
@@ -78,37 +69,29 @@ function DecisionStamp({ outcome }: { outcome: DecisionOutcome }) {
 
 function ConfidenceBar({ score }: { score: number }) {
   const pct   = Math.round(score * 100);
-  const color = score >= 0.85 ? "#4A7C59" : score >= 0.6 ? "#92610A" : "#8B3A3A";
+  const color = score >= 0.85 ? "#4e7d6a" : score >= 0.6 ? "#c49428" : "#ff4052";
   return (
     <div className="flex items-center gap-2">
-      <span className="font-mono text-xs text-text-primary tabular">{score.toFixed(2)}</span>
-      <div className="w-16 h-1 bg-border rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+      <span className="font-mono text-xs text-ink tabular">{score.toFixed(2)}</span>
+      <div className="w-16 h-1 rounded-full overflow-hidden" style={{ backgroundColor: "#f0e4d8" }}>
+        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
-      <span className="text-[10px] font-mono text-text-muted">{pct}%</span>
+      <span className="text-[10px] font-mono text-ink-muted">{pct}%</span>
     </div>
   );
 }
 
-// ── Financial breakdown receipt ───────────────────────────────────────────────
+// ── Financial breakdown ───────────────────────────────────────────────────────
 
 export function FinancialBreakdownTable({ fb }: { fb: FinancialBreakdown }) {
-  const rows: { label: string; value: string; mod?: "deduct" | "credit" | "total" }[] = [
-    { label: "Base amount", value: fmt(fb.base_amount) },
-  ];
-  if (fb.sub_limit_applied != null) {
+  type Row = { label: string; value: string; mod?: "deduct" | "credit" | "total" };
+  const rows: Row[] = [{ label: "Base amount", value: fmt(fb.base_amount) }];
+  if (fb.sub_limit_applied != null)
     rows.push({ label: "Sub-limit cap", value: "− " + fmt(fb.base_amount - fb.amount_after_sub_limit), mod: "deduct" });
-  }
-  if (fb.network_discount_percent != null) {
-    rows.push({
-      label: `Network discount (${fb.network_discount_percent}%)`,
-      value: "− " + fmt(fb.amount_after_sub_limit - fb.amount_after_discount),
-      mod: "credit",
-    });
-  }
-  if (fb.co_pay_amount != null) {
+  if (fb.network_discount_percent != null)
+    rows.push({ label: `Network discount (${fb.network_discount_percent}%)`, value: "− " + fmt(fb.amount_after_sub_limit - fb.amount_after_discount), mod: "credit" });
+  if (fb.co_pay_amount != null)
     rows.push({ label: `Co-pay (${fb.co_pay_percent}%)`, value: "− " + fmt(fb.co_pay_amount), mod: "deduct" });
-  }
   rows.push({ label: "Approved", value: fmt(fb.final_amount), mod: "total" });
 
   return (
@@ -118,14 +101,14 @@ export function FinancialBreakdownTable({ fb }: { fb: FinancialBreakdown }) {
         <tbody>
           {rows.map((r, i) => (
             <tr key={i} className={r.mod === "total" ? "border-t-2 border-border-strong" : "border-t border-border"}>
-              <td className={`py-1.5 ${r.mod === "total" ? "font-semibold text-text-primary font-serif text-sm" : "text-text-secondary"}`}>
+              <td className={`py-1.5 font-sans ${r.mod === "total" ? "font-semibold text-ink text-sm" : "text-ink-muted"}`}>
                 {r.label}
               </td>
               <td className={`py-1.5 text-right font-mono ${
-                r.mod === "total"   ? "font-semibold text-text-primary text-sm font-serif"
+                r.mod === "total"    ? "font-semibold text-ink text-sm"
                 : r.mod === "deduct" ? "text-fail"
                 : r.mod === "credit" ? "text-ok"
-                : "text-text-primary"
+                : "text-ink"
               }`}>
                 {r.value}
               </td>
@@ -146,19 +129,19 @@ export function LineItemTable({ items }: { items: LineItemEvaluation[] }) {
       <table className="w-full tabular text-xs">
         <thead>
           <tr className="border-b border-border">
-            <th className="text-left pb-1.5 font-medium text-text-muted">Description</th>
-            <th className="text-right pb-1.5 font-medium text-text-muted pr-3">Amount</th>
-            <th className="text-right pb-1.5 font-medium text-text-muted">Status</th>
+            <th className="text-left pb-1.5 font-medium text-ink-muted">Description</th>
+            <th className="text-right pb-1.5 font-medium text-ink-muted pr-3">Amount</th>
+            <th className="text-right pb-1.5 font-medium text-ink-muted">Status</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
           {items.map((item, i) => (
             <tr key={i} className={item.covered ? "" : "opacity-55"}>
-              <td className="py-1.5 text-text-primary">
+              <td className="py-1.5 text-ink font-sans">
                 <div>{item.description}</div>
-                <div className="text-[10px] text-text-muted mt-0.5 leading-snug">{item.reason}</div>
+                <div className="text-[10px] text-ink-muted mt-0.5 leading-snug">{item.reason}</div>
               </td>
-              <td className="py-1.5 text-right font-mono pr-3 text-text-primary align-top">{fmt(item.amount)}</td>
+              <td className="py-1.5 text-right font-mono pr-3 text-ink align-top">{fmt(item.amount)}</td>
               <td className="py-1.5 text-right align-top">
                 <span className={`font-mono text-[10px] font-medium ${item.covered ? "text-ok" : "text-fail"}`}>
                   {item.covered ? "covered" : "excluded"}
@@ -179,14 +162,15 @@ export function DecisionSummary({ data }: { data: ClaimDecision }) {
 
   return (
     <div>
-      {/* Stamp + amount + confidence */}
+      {/* Stamp + amount + confidence row */}
       <div className="flex items-start justify-between gap-6 mb-5 flex-wrap">
         <div className="flex items-start gap-5 flex-wrap">
           <DecisionStamp outcome={data.decision} />
           {data.approved_amount != null && (
             <div className="pt-1">
               <p className="label mb-1">Approved amount</p>
-              <p className="font-serif font-semibold text-2xl text-text-primary tabular">
+              {/* Serif display — restrained "verdict" size */}
+              <p className="font-serif font-semibold text-[26px] leading-tight text-ink tabular">
                 {fmt(data.approved_amount)}
               </p>
             </div>
@@ -202,27 +186,24 @@ export function DecisionSummary({ data }: { data: ClaimDecision }) {
       {data.rejection_reasons.length > 0 && (
         <div className="flex gap-1.5 mb-4 flex-wrap">
           {data.rejection_reasons.map(r => (
-            <span key={r} className="font-mono text-[10px] border border-fail text-fail px-1.5 py-0.5 rounded">
+            <span key={r}
+              className={`font-mono text-[10px] border px-1.5 py-0.5 rounded ${o.tagBorder}`}>
               {r}
             </span>
           ))}
         </div>
       )}
 
-      {/* Reason text */}
-      <div className={`border-l-2 ${o.borderColor} pl-3 mb-5`}>
-        <p className="text-sm text-text-primary leading-relaxed">{data.reason}</p>
+      {/* Reason — left border accent in outcome color */}
+      <div className={`border-l-2 ${o.borderLeft} pl-3 mb-5`}>
+        <p className="text-sm text-ink leading-relaxed font-sans">{data.reason}</p>
       </div>
 
       {/* Financial breakdown + line items */}
       {(data.financial_breakdown || data.line_item_evaluations.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-border mb-5">
-          {data.financial_breakdown && (
-            <FinancialBreakdownTable fb={data.financial_breakdown} />
-          )}
-          {data.line_item_evaluations.length > 0 && (
-            <LineItemTable items={data.line_item_evaluations} />
-          )}
+          {data.financial_breakdown && <FinancialBreakdownTable fb={data.financial_breakdown} />}
+          {data.line_item_evaluations.length > 0 && <LineItemTable items={data.line_item_evaluations} />}
         </div>
       )}
     </div>

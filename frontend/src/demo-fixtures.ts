@@ -152,3 +152,56 @@ export const DEMO_VERIFICATION_FAILURE: PipelineResponse = {
       "You uploaded prescription and prescription, but a CONSULTATION claim requires a PRESCRIPTION and HOSPITAL_BILL. Please re-upload with the missing document(s): hospital bill.",
   },
 };
+
+export const DEMO_PARTIAL: PipelineResponse = {
+  type: "decision",
+  data: {
+    decision: "PARTIAL",
+    approved_amount: 8000.0,
+    reason: "Partial approval: Root Canal Treatment (₹8,000) is covered. Teeth Whitening (₹4,000) is excluded as a cosmetic dental procedure.",
+    rejection_reasons: [],
+    confidence_score: 0.93,
+    financial_breakdown: {
+      base_amount: 8000.0,
+      sub_limit_applied: null,
+      amount_after_sub_limit: 8000.0,
+      network_discount_percent: null,
+      amount_after_discount: 8000.0,
+      co_pay_percent: null,
+      co_pay_amount: null,
+      final_amount: 8000.0,
+    },
+    line_item_evaluations: [
+      { description: "Root Canal Treatment", amount: 8000, covered: true,  reason: "'Root Canal Treatment' is a covered procedure under opd_categories.dental.covered_procedures." },
+      { description: "Teeth Whitening",       amount: 4000, covered: false, reason: "'Teeth Whitening' is excluded under opd_categories.dental.excluded_procedures." },
+    ],
+    trace: {
+      claim_id: "demo-tc006-partial",
+      events: [
+        { stage: "document_verification", component: "DocumentVerificationAgent", timestamp: TS, status: "ok",
+          summary: "Documents verified — 1 hospital bill, patient identity consistent.",
+          details: { check: "document_verification", detail: "Passed", policy_clause: "document_requirements.DENTAL" } },
+        { stage: "extraction", component: "ExtractionAgent", timestamp: TS, status: "ok",
+          summary: "Extracted HOSPITAL_BILL — confidence 0.94",
+          details: { overall_confidence: 0.94, is_partial: false, field_confidence: { total: 0.97, hospital_name: 0.91 } } },
+        { stage: "policy_evaluation", component: "PolicyEvaluationAgent", timestamp: TS, status: "ok",
+          summary: "6 checks passed — dental line-item evaluation: 1 covered, 1 excluded.",
+          details: {
+            checks: [
+              { check_name: "member_lookup",            passed: true, detail: "Member EMP002 (Priya Singh) found. Policy PLUM_GHI_2024 ACTIVE.", relevant_policy_clause: "policy_holder.renewal_status" },
+              { check_name: "exclusion",                passed: true, detail: "No global exclusions — dental cosmetic exclusion handled at line-item level.", relevant_policy_clause: "exclusions.conditions" },
+              { check_name: "waiting_period",           passed: true, detail: "Initial 30-day period passed. No specific conditions.", relevant_policy_clause: "waiting_periods.initial_waiting_period_days" },
+              { check_name: "fraud_signals",            passed: true, detail: "No fraud signals detected.", relevant_policy_clause: "fraud_thresholds" },
+              { check_name: "sub_limit_and_line_items", passed: true, detail: "DENTAL: Root Canal ₹8,000 covered; Teeth Whitening ₹4,000 excluded. Approved base ₹8,000.", relevant_policy_clause: "opd_categories.dental" },
+              { check_name: "financial_calculation",    passed: true, detail: "Base ₹8,000 → no discount, no co-pay → final ₹8,000", relevant_policy_clause: "opd_categories.dental" },
+            ],
+          } },
+        { stage: "decision", component: "DecisionAgent", timestamp: TS, status: "ok",
+          summary: "PARTIAL — ₹8,000 approved (1 of 2 line items excluded), confidence 0.93",
+          details: { decision: "PARTIAL", approved_amount: 8000, confidence_score: 0.93 } },
+      ],
+      final_decision_explanation:
+        "Partial approval: dental claim EMP002 — Root Canal Treatment (₹8,000) covered per opd_categories.dental.covered_procedures; Teeth Whitening (₹4,000) excluded per opd_categories.dental.excluded_procedures. Sub-limit ₹10,000 not reached. No co-pay on dental. Approved: ₹8,000.",
+    },
+  },
+};
