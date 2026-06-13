@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronRight, ShieldCheck, ScanSearch, Scale, CheckSquare, Server, AlertTriangle } from "lucide-react";
+import { ChevronDown, ChevronRight, ShieldCheck, ScanSearch, Scale, CheckSquare, Server, AlertTriangle, Copy, Check } from "lucide-react";
 import type { TraceEvent, ClaimTrace } from "../types";
 
 function StageIcon({ stage }: { stage: string }) {
@@ -31,6 +31,30 @@ interface PolicyCheck {
   relevant_policy_clause?: string | null;
 }
 
+function CopyableRef({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(value).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <span className="group/ref inline-flex items-center gap-1">
+      <span className="policy-ref">{value}</span>
+      <button
+        type="button"
+        onClick={copy}
+        className="opacity-0 group-hover/ref:opacity-100 transition-opacity text-ink-muted hover:text-ink"
+        title="Copy policy clause reference"
+      >
+        {copied ? <Check size={9} className="text-ok" /> : <Copy size={9} />}
+      </button>
+    </span>
+  );
+}
+
 function PolicyCheckRow({ check }: { check: PolicyCheck }) {
   return (
     <div className="flex gap-2.5 py-1.5 border-b border-border last:border-0">
@@ -39,7 +63,7 @@ function PolicyCheckRow({ check }: { check: PolicyCheck }) {
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="font-mono text-[11px] text-ink">{check.check_name}</span>
           {check.relevant_policy_clause && (
-            <span className="policy-ref">{check.relevant_policy_clause}</span>
+            <CopyableRef value={check.relevant_policy_clause} />
           )}
         </div>
         <p className="text-[11px] text-ink-muted mt-0.5 leading-snug font-sans">{check.detail}</p>
@@ -65,7 +89,7 @@ function EventDetails({ event }: { event: TraceEvent }) {
     return (
       <div className="mt-2 bg-paper rounded border border-border p-2.5 space-y-1.5">
         {detail && <p className="text-[11px] text-ink-muted leading-snug font-sans">{detail}</p>}
-        {clause && <span className="policy-ref">{clause}</span>}
+        {clause && <CopyableRef value={clause} />}
         {Object.entries(d)
           .filter(([k]) => !["check", "detail", "policy_clause"].includes(k))
           .map(([k, v]) => (
@@ -125,8 +149,15 @@ function EventDetails({ event }: { event: TraceEvent }) {
   );
 }
 
-function TraceEventRow({ event, defaultOpen, animDelay }: { event: TraceEvent; defaultOpen: boolean; animDelay: number }) {
-  const [open, setOpen] = useState(defaultOpen);
+function TraceEventRow({ event, defaultOpen, forceOpen, animDelay }: {
+  event: TraceEvent;
+  defaultOpen: boolean;
+  forceOpen: boolean | null;
+  animDelay: number;
+}) {
+  const [localOpen, setLocalOpen] = useState(defaultOpen);
+  // forceOpen=null means "use local state"; true/false overrides
+  const open       = forceOpen !== null ? forceOpen : localOpen;
   const hasDetails = Object.keys(event.details).length > 0;
 
   return (
@@ -137,7 +168,7 @@ function TraceEventRow({ event, defaultOpen, animDelay }: { event: TraceEvent; d
 
       <button
         type="button"
-        onClick={() => hasDetails && setOpen(o => !o)}
+        onClick={() => hasDetails && setLocalOpen(o => !o)}
         className={`w-full text-left flex items-start gap-2 ${hasDetails ? "cursor-pointer" : "cursor-default"}`}
       >
         <div className="flex items-center gap-1.5 min-w-[150px]">
@@ -166,16 +197,56 @@ function TraceEventRow({ event, defaultOpen, animDelay }: { event: TraceEvent; d
 }
 
 export function TraceTimeline({ trace }: { trace: ClaimTrace }) {
+  // null = use each row's own default; true/false = override all
+  const [allOpen, setAllOpen] = useState<boolean | null>(null);
+
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-3">
-        <p className="label">Processing Trace</p>
-        <span className="font-mono text-[10px] text-ink-muted">{trace.events.length} events</span>
+      {/* Header: label + status badge + expand-all toggle */}
+      <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          <p className="label">Processing Trace</p>
+          {/* Status summary badge */}
+          {(() => {
+            const failed   = trace.events.filter(e => e.status === "failed").length;
+            const degraded = trace.events.filter(e => e.status === "degraded").length;
+            const ok       = trace.events.filter(e => e.status === "ok").length;
+            return (
+              <span className="flex items-center gap-1.5">
+                {failed > 0 && (
+                  <span className="font-mono text-[9px] text-fail">{failed} failed</span>
+                )}
+                {degraded > 0 && (
+                  <span className="font-mono text-[9px] text-degraded">{degraded} degraded</span>
+                )}
+                {ok > 0 && (
+                  <span className="font-mono text-[9px] text-ok">{ok} ok</span>
+                )}
+              </span>
+            );
+          })()}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[10px] text-ink-muted">{trace.events.length} events</span>
+          <button
+            type="button"
+            onClick={() => setAllOpen(o => !o)}
+            className="text-[10px] font-sans text-ink-muted hover:text-ink transition-colors"
+          >
+            {allOpen ? "Collapse all" : "Expand all"}
+          </button>
+        </div>
       </div>
 
       <div>
         {trace.events.map((ev, i) => (
-          <TraceEventRow key={i} event={ev} defaultOpen={ev.status !== "ok"} animDelay={i * 55} />
+          <TraceEventRow
+            key={i}
+            event={ev}
+            defaultOpen={allOpen !== null ? allOpen : ev.status !== "ok"}
+            forceOpen={allOpen}
+            animDelay={i * 55}
+          />
         ))}
       </div>
 
