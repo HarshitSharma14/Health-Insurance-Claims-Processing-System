@@ -31,7 +31,7 @@ import base64
 import google.generativeai as genai
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.orchestrator.pipeline import process_claim
 from app.policy.loader import load_policy
@@ -132,6 +132,7 @@ class ClaimSubmissionJSON(BaseModel):
     policy_id: str
     claim_category: ClaimCategory
     treatment_date: date
+    submission_date: date = Field(default_factory=date.today)
     claimed_amount: float
     hospital_name: str | None = None
     ytd_claims_amount: float | None = None
@@ -294,6 +295,7 @@ async def submit_claim_json(body: ClaimSubmissionJSON) -> PipelineResponse:
             policy_id=body.policy_id,
             claim_category=body.claim_category,
             treatment_date=body.treatment_date,
+            submission_date=body.submission_date,
             claimed_amount=body.claimed_amount,
             hospital_name=body.hospital_name,
             ytd_claims_amount=body.ytd_claims_amount,

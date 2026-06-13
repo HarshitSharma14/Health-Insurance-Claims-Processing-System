@@ -152,11 +152,13 @@ def build_inputs(
     history = make_claims_history(inp.get("claims_history", []))
 
     # Submission
+    treatment_date = date.fromisoformat(inp["treatment_date"])
     submission = ClaimSubmission(
         member_id=inp["member_id"],
         policy_id=inp["policy_id"],
         claim_category=ClaimCategory(inp["claim_category"]),
-        treatment_date=date.fromisoformat(inp["treatment_date"]),
+        treatment_date=treatment_date,
+        submission_date=treatment_date,  # eval harness: treat submission as same-day
         claimed_amount=float(inp["claimed_amount"]),
         hospital_name=inp.get("hospital_name"),
         ytd_claims_amount=float(inp["ytd_claims_amount"]) if "ytd_claims_amount" in inp else None,

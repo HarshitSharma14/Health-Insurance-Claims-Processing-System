@@ -67,6 +67,7 @@ def _submission(
         policy_id="PLUM_GHI_2024",
         claim_category=category,
         treatment_date=treatment_date,
+        submission_date=treatment_date,
         claimed_amount=claimed_amount,
         hospital_name=hospital_name,
         claims_history=claims_history or [],

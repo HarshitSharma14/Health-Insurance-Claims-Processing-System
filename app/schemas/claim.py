@@ -97,6 +97,7 @@ class ClaimSubmission(BaseModel):
     policy_id: str
     claim_category: ClaimCategory
     treatment_date: date
+    submission_date: date = Field(default_factory=date.today)
     claimed_amount: float = Field(gt=0)
     hospital_name: str | None = None  # used for network-hospital check (Stage 8)
     ytd_claims_amount: float | None = None

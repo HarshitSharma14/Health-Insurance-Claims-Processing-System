@@ -818,11 +818,10 @@ async def run(
     line_item_evals: list[LineItemEvaluation] = []
     financial_breakdown: FinancialBreakdown | None = None
 
-    # Submission rules — minimum claimable amount
-    # Note: deadline_days_from_treatment is not enforced here because
-    # ClaimSubmission has no submission_date field. Documented in architecture.md.
+    # Submission rules — minimum claimable amount and filing deadline
     sub_rules = policy.get("submission_rules", {})
     min_amount: float = sub_rules.get("minimum_claim_amount", 500)
+    deadline_days: int = sub_rules.get("deadline_days_from_treatment", 30)
 
     if submission.claimed_amount < min_amount:
         detail = (
@@ -834,6 +833,23 @@ async def run(
         checks.append(check)
         _emit(trace, check)
         rejection_reasons.append("BELOW_MINIMUM_AMOUNT")
+        return PolicyEvaluationResult(
+            member_found=False, checks=checks,
+            rejection_reasons=rejection_reasons,
+        )
+
+    deadline = submission.treatment_date + timedelta(days=deadline_days)
+    if submission.submission_date > deadline:
+        detail = (
+            f"Claim submitted on {submission.submission_date}, which is more than "
+            f"{deadline_days} days after treatment date "
+            f"{submission.treatment_date} (deadline: {deadline})."
+        )
+        check = _check_result("submission_rules", False, detail,
+                              clause="submission_rules.deadline_days_from_treatment")
+        checks.append(check)
+        _emit(trace, check)
+        rejection_reasons.append("SUBMISSION_DEADLINE_EXCEEDED")
         return PolicyEvaluationResult(
             member_found=False, checks=checks,
             rejection_reasons=rejection_reasons,

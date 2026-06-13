@@ -66,6 +66,7 @@ def _sub(member_id, category, treatment_date, claimed_amount,
         policy_id="PLUM_GHI_2024",
         claim_category=category,
         treatment_date=treatment_date,
+        submission_date=treatment_date,
         claimed_amount=claimed_amount,
         hospital_name=hospital_name,
         claims_history=claims_history or [],
@@ -566,6 +567,7 @@ async def test_api_json_endpoint_verification_failure():
         "policy_id": "PLUM_GHI_2024",
         "claim_category": "CONSULTATION",
         "treatment_date": "2024-11-01",
+        "submission_date": "2024-11-01",
         "claimed_amount": 1500,
         "documents": [
             {"file_id": "F001", "actual_type": "PRESCRIPTION"},
@@ -604,6 +606,7 @@ async def test_api_json_endpoint_approved():
         "policy_id": "PLUM_GHI_2024",
         "claim_category": "CONSULTATION",
         "treatment_date": "2024-11-01",
+        "submission_date": "2024-11-01",
         "claimed_amount": 1500,
         "documents": [
             {"file_id": "F007", "actual_type": "PRESCRIPTION"},
