@@ -11,18 +11,20 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    # Anthropic credentials
+    # Anthropic credentials (kept for reference; extraction now uses Gemini)
     anthropic_api_key: str = "UNSET"
+
+    # Gemini credentials — get free key at aistudio.google.com
+    gemini_api_key: str = "UNSET"
 
     # Policy data
     policy_file_path: str = "policy_terms.json"
 
     # LLM models
-    # Assumption: claude-sonnet-4-5 for extraction/reasoning (vision-capable),
-    # claude-haiku-4-5 for lightweight classification (cheaper, faster).
-    # See docs/assumptions.md — "LLM model selection".
-    extraction_model: str = "claude-sonnet-4-5"
-    classification_model: str = "claude-haiku-4-5"
+    # Extraction uses gemini-1.5-flash (free tier: 1500 req/day, vision-capable).
+    # See docs/assumptions.md — "LLM provider: Gemini Flash".
+    extraction_model: str = "gemini-1.5-flash"
+    classification_model: str = "gemini-1.5-flash"
 
     # LLM call guards
     llm_timeout_seconds: int = 30
