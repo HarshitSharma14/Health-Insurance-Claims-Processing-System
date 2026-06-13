@@ -6,6 +6,8 @@ in data-contracts.md.
 
 from pydantic import BaseModel
 
+from app.schemas.financial import FinancialBreakdown  # noqa: F401 — re-exported
+
 
 class MemberNotFoundError(Exception):
     """Raised internally by the Policy Evaluation Agent when member_id is absent
@@ -70,3 +72,4 @@ class PolicyEvaluationResult(BaseModel):
     co_pay_percent: float | None = None
     network_discount_percent: float | None = None
     is_network_hospital: bool | None = None
+    financial_breakdown: FinancialBreakdown | None = None  # populated by Stage 8

@@ -1,41 +1,18 @@
 """Decision Agent output schema.
 
 Matches ClaimDecision / FinancialBreakdown in data-contracts.md.
+FinancialBreakdown lives in app.schemas.financial to avoid circular imports
+with app.schemas.policy (both need it). It is re-exported from here for
+backwards compatibility.
 """
 
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from app.schemas.financial import FinancialBreakdown  # noqa: F401 — re-exported
 from app.schemas.policy import LineItemEvaluation
 from app.schemas.trace import ClaimTrace
-
-
-class FinancialBreakdown(BaseModel):
-    """Explicit breakdown of the financial calculation (Stage 8).
-
-    Order matters — network discount is applied FIRST, then co-pay on the
-    discounted amount. Incorrect ordering (co-pay before discount) produces
-    a different wrong number (TC010 directly tests this).
-
-    base_amount           — claimed or covered-line-items total, pre-cap
-    sub_limit_applied     — the sub_limit value from policy if capping occurred
-    amount_after_sub_limit— base_amount capped at sub_limit (or == base_amount)
-    network_discount_percent — from policy_terms.json if is_network_hospital
-    amount_after_discount — amount_after_sub_limit × (1 - discount/100)
-    co_pay_percent        — from opd_categories[category].copay_percent
-    co_pay_amount         — amount_after_discount × (co_pay_percent / 100)
-    final_amount          — amount_after_discount - co_pay_amount == approved_amount
-    """
-
-    base_amount: float
-    sub_limit_applied: float | None = None
-    amount_after_sub_limit: float
-    network_discount_percent: float | None = None
-    amount_after_discount: float
-    co_pay_percent: float | None = None
-    co_pay_amount: float | None = None
-    final_amount: float  # == ClaimDecision.approved_amount
 
 
 class ClaimDecision(BaseModel):

@@ -11,8 +11,9 @@ from app.schemas.claim import (
     DocumentType,
     UploadedDocument,
 )
-from app.schemas.decision import ClaimDecision, FinancialBreakdown
+from app.schemas.decision import ClaimDecision
 from app.schemas.extraction import ExtractedDocumentData, LineItem
+from app.schemas.financial import FinancialBreakdown
 from app.schemas.policy import (
     LineItemEvaluation,
     MemberNotFoundError,
@@ -41,9 +42,10 @@ __all__ = [
     "MemberNotFoundError",
     "PolicyCheckResult",
     "PolicyEvaluationResult",
+    # financial
+    "FinancialBreakdown",
     # decision
     "ClaimDecision",
-    "FinancialBreakdown",
     # trace
     "ClaimTrace",
     "TraceEvent",

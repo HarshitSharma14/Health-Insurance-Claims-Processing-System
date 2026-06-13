@@ -63,7 +63,23 @@ can still pass and produce an APPROVED outcome.
 
 ---
 
-## Corrupted/unopenable file handling
+## Stage ordering: Exclusion before Waiting Period
+**Assumption:** Stage 3 (global exclusion check) runs **before** Stage 2 (waiting period).
+
+**Why:** A globally-excluded condition is more definitive than a waiting-period violation for the same condition. TC012 (bariatric/obesity) must return `EXCLUDED_CONDITION` even though the `obesity_treatment` waiting period (365 days) would also fire for the same diagnosis. The exclusion takes precedence because: (a) waiting periods eventually expire but exclusions never do, (b) it gives the member a clearer actionable message.
+
+**Would change:** If the spec is updated to make waiting period take precedence, swap the order back and update TC012 to expect `WAITING_PERIOD`.
+
+---
+
+## per_claim_limit scope for line-item categories
+**Assumption:** The `per_claim_limit` (₹5,000) hard-stop **does not apply** to DENTAL and VISION claims when line-item evaluation is performed. The `sub_limit` for those categories (DENTAL: ₹10,000, VISION: ₹5,000) governs the cap instead.
+
+**Why:** TC006 shows a DENTAL claim with ₹12,000 claimed (root canal ₹8,000 + whitening ₹4,000) expected to produce `PARTIAL` with ₹8,000 approved — not `PER_CLAIM_EXCEEDED`. If the per_claim_limit were applied to the approved_base of ₹8,000, it would incorrectly reject the claim. The sub_limit (₹10,000) is the governing ceiling for DENTAL.
+
+**Would change:** Make this configurable per-category in policy_terms.json rather than hardcoded in logic.
+
+---
 **Assumption:** Corrupted or unopenable files (e.g. truncated PDF, unsupported format)
 are mapped to `VerificationFailureType.UNREADABLE_DOCUMENT` — not a separate enum value.
 
