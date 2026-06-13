@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     # LLM models
     # Extraction uses gemini-1.5-flash (free tier: 1500 req/day, vision-capable).
     # See docs/assumptions.md — "LLM provider: Gemini Flash".
-    extraction_model: str = "gemini-1.5-flash"
-    classification_model: str = "gemini-1.5-flash"
+    extraction_model: str = "gemini-3.1-flash-lite"
+    classification_model: str = "gemini-3.1-flash-lite"
 
     # LLM call guards
     llm_timeout_seconds: int = 30

@@ -81,7 +81,6 @@ _RESPONSE_SCHEMA = {
         },
         "field_confidence": {
             "type": "object",
-            "additionalProperties": {"type": "number"},
         },
     },
 }
