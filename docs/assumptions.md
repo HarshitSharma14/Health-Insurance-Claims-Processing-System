@@ -118,7 +118,24 @@ in the trace/message; worth adding if ops feedback shows confusion between the t
 
 ---
 
-## Hernia waiting period: disc herniation exclusion
+## Keyword matching vs LLM matching for waiting periods and exclusions
+**Assumption:** Stages 2 (waiting period) and 3 (exclusion) currently use plain keyword/substring matching — `_CONDITION_KEYWORDS` and `_EXCLUSION_KEYWORDS` dicts in `policy_evaluator.py`. These are deterministic, fast, and unit-testable at no API cost.
+
+**Why:** The assignment timeline (2-3 days) and the requirement to make this testable without live LLM calls in CI. All 12 test cases pass with the keyword approach.
+
+**Limitation / would change with more time:** Keyword matching has no semantic understanding. "Suspected Lumbar Disc Herniation" nearly triggered the wrong waiting period (fixed with `_CONDITION_NEGATIVE_CONTEXT`). With more time, swap `_condition_matches()` and `_text_contains_any()` for an LLM call to `classification_model` with a structured tool schema returning `{matched: bool, condition_key: str, confidence: float}`. The function signature is already designed to support this swap without changing callers.
+
+---
+
+## Dental sub_limit vs global per_claim_limit
+**Assumption:** `per_claim_limit` (Rs5,000 from `coverage.per_claim_limit`) is NOT applied to DENTAL and VISION claims when line-item evaluation runs. The category-specific `sub_limit` (DENTAL: Rs10,000, VISION: Rs5,000) governs instead.
+
+**Why:** TC006 submits a dental claim with Rs12,000 claimed (root canal Rs8,000 + teeth whitening Rs4,000). Expected outcome is PARTIAL at Rs8,000 approved. If `per_claim_limit` were applied to the Rs8,000 approved base, the claim would be rejected as PER_CLAIM_EXCEEDED — which is wrong. The policy design intent is that DENTAL/VISION use their own per-category sub_limit caps, not the generic per_claim_limit. This is documented in `policy_evaluator.py` via `categories_with_line_item_eval`.
+
+**Would change:** Add a per-category `use_sub_limit_instead_of_per_claim_limit: bool` flag to `policy_terms.json` so this is data-driven rather than hardcoded.
+
+---
+
 **Assumption:** The `hernia` waiting period (365 days) covers abdominal hernia surgery. "Lumbar Disc Herniation" / "disc herniation" must NOT trigger this waiting period — it is a spinal condition, not an abdominal hernia. Implemented via `_CONDITION_NEGATIVE_CONTEXT` in `policy_evaluator.py`: if any of the negative-context phrases (`"disc herniation"`, `"lumbar disc"`, etc.) appear in the diagnosis text alongside `"hernia"`, the condition match is suppressed.
 
 **Why:** TC007 (MRI for Lumbar Disc Herniation) expects `PRE_AUTH_MISSING`, not `WAITING_PERIOD`. Without this exclusion, "herniation" in the diagnosis string matched the hernia keyword, incorrectly firing the 365-day waiting period before the pre-auth check could run. EMP007 joined 2024-04-01 and treated 2024-11-02 (215 days) — within the hernia window.

@@ -56,6 +56,11 @@ def _wrap(result: DocumentVerificationResult | ClaimDecision) -> PipelineRespons
     return PipelineResponse(type="decision", data=result)
 
 
+# In-memory claim store (swap for SQLite behind an interface later)
+# Maps claim_id (str) -> PipelineResponse
+_claim_store: dict[str, PipelineResponse] = {}
+
+
 # ---------------------------------------------------------------------------
 # JSON body schema for the /claims/json endpoint
 # ---------------------------------------------------------------------------
@@ -163,7 +168,11 @@ async def submit_claim(
         logger.exception("Unexpected pipeline error for member %s", member_id)
         raise HTTPException(status_code=500, detail="Internal processing error.") from exc
 
-    return _wrap(result)
+    response = _wrap(result)
+    # Store by claim_id (from trace if available)
+    if isinstance(result, ClaimDecision):
+        _claim_store[result.trace.claim_id] = response
+    return response
 
 
 # ---------------------------------------------------------------------------
@@ -239,7 +248,10 @@ async def submit_claim_json(body: ClaimSubmissionJSON) -> PipelineResponse:
         logger.exception("Unexpected pipeline error for member %s", body.member_id)
         raise HTTPException(status_code=500, detail="Internal processing error.") from exc
 
-    return _wrap(result)
+    response = _wrap(result)
+    if isinstance(result, ClaimDecision):
+        _claim_store[result.trace.claim_id] = response
+    return response
 
 
 # ---------------------------------------------------------------------------
@@ -248,18 +260,18 @@ async def submit_claim_json(body: ClaimSubmissionJSON) -> PipelineResponse:
 
 @app.get(
     "/claims/{claim_id}",
-    response_model=ClaimDecision,
+    response_model=PipelineResponse,
     summary="Retrieve a past claim decision",
 )
-async def get_claim(claim_id: str) -> ClaimDecision:
-    """Retrieve decision + trace for a previously submitted claim.
-
-    Placeholder — requires persistence layer (SQLite / in-memory store).
-    """
-    raise HTTPException(
-        status_code=501,
-        detail="Claim retrieval not yet implemented.",
-    )
+async def get_claim(claim_id: str) -> PipelineResponse:
+    """Retrieve decision + trace for a previously submitted claim (in-memory store)."""
+    stored = _claim_store.get(claim_id)
+    if stored is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Claim '{claim_id}' not found. Claims are stored in memory only and are lost on server restart.",
+        )
+    return stored
 
 
 @app.get("/health")
