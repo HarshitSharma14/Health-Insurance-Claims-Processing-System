@@ -89,3 +89,17 @@ message" — UNREADABLE_DOCUMENT is the closest semantic fit and keeps the enum 
 
 **Would change:** A fourth `CORRUPTED_FILE` type would make the distinction clearer
 in the trace/message; worth adding if ops feedback shows confusion between the two.
+
+## EXCLUDED_CONDITION confidence branch
+**Assumption:** When `rejection_reasons` contains `EXCLUDED_CONDITION`, confidence is derived from the maximum diagnosis/treatment field confidence across non-degraded documents, floored at 0.90. Per-document extraction quality penalties are explicitly NOT applied. A deterministic keyword match against the global exclusion list should not have its confidence reduced because an unrelated field (e.g. doctor_name) was illegible. TC012 requires confidence > 0.90 even when other docs in the claim are degraded. This is an explicit branch in `_compute_confidence`, not an incidental side-effect of TC012's fixture.
+
+**Would change:** Use an LLM-based semantic match and return the model's own confidence score for this branch.
+
+---
+
+## TC011 simulate_component_failure: no double-penalty
+**Assumption:** When `simulate_component_failure=True`, per-document extraction quality penalties are skipped inside `_compute_confidence` (via `simulate_failure=True` parameter). The caller (`_decide`) applies a single -0.30 penalty after the call. Without this, a degraded extraction doc (-0.30) + simulate penalty (-0.30) = 0.40, below the MANUAL_REVIEW threshold, incorrectly changing TC011's expected APPROVED to MANUAL_REVIEW.
+
+**Would change:** Make the simulate penalty configurable per test case.
+
+---
