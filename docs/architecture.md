@@ -64,7 +64,7 @@ A `passed: false` result has `decision: null` — not `MANUAL_REVIEW`. This is a
 ### 3.2 Extraction Agent (`app/agents/extractor.py`)
 
 One call per document, run concurrently via `asyncio.gather(..., return_exceptions=True)`. Each call:
-- Sends the document as base64 image/PDF to a vision-capable Claude model (`claude-sonnet-4-5`)
+- Sends the document as base64 image/PDF to a vision-capable Gemini model (`gemini-3.1-flash-lite`)
 - Uses forced tool-call output (Anthropic tool schema) matching `ExtractedDocumentData`
 - Returns per-field confidence scores and an `is_partial` flag
 - On failure: one retry with exponential backoff, then returns a degraded result (`overall_confidence: 0.0`, `is_partial: True`) — never raises to the caller
@@ -192,8 +192,9 @@ Stages 2 and 3 currently use keyword/substring matching. This is deliberate — 
 | Keyword matching for policy conditions | Will miss diagnoses phrased differently than the exact keywords in `policy_terms.json` (e.g. "morbid obesity" works; "BMI 38, gastric sleeve candidate" does not) | Replace `_condition_matches()` with an LLM classifier using a structured tool schema |
 | In-memory claim store | Claims are lost on server restart; no history | Add SQLite (dev) / PostgreSQL (prod) behind the existing store interface |
 | No authentication | Any caller can submit claims or read any `GET /claims/{id}` | Add JWT/API key middleware at the route layer |
+| `submission_rules.deadline_days_from_treatment` not enforced | `ClaimSubmission` has no `submission_date` field; adding one would require frontend + API changes | Add `submission_date` to `ClaimSubmission`, default to `date.today()` on the API side |
 | Synchronous pipeline | User waits while LLM calls run | Move to async job queue: POST returns 202 + job ID, client polls or receives webhook |
-| Extraction model not benchmarked | `claude-sonnet-4-5` chosen without a held-out document benchmark | Run offline evaluation on real Indian medical document samples before production |
+| Extraction model not benchmarked | `gemini-3.1-flash-lite` chosen without a held-out document benchmark | Run offline evaluation on real Indian medical document samples before production |
 
 ---
 

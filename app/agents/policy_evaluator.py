@@ -520,6 +520,7 @@ def _stage6_fraud_signals(
     """Stage 6: fraud heuristics — sets fraud_flags (MANUAL_REVIEW, not REJECTED)."""
     thresholds = policy.get("fraud_thresholds", {})
     same_day_limit: int = thresholds.get("same_day_claims_limit", 2)
+    monthly_limit: int = thresholds.get("monthly_claims_limit", 6)
     high_value_threshold: float = thresholds.get("high_value_claim_threshold", 25000)
 
     signals: list[str] = []
@@ -533,6 +534,20 @@ def _stage6_fraud_signals(
         signal = (
             f"{same_day_count + 1} claims submitted on {submission.treatment_date} "
             f"(including this one), exceeds same-day limit of {same_day_limit}."
+        )
+        signals.append(signal)
+
+    # Monthly claims check
+    month_count = sum(
+        1 for h in submission.claims_history
+        if h.date.year == submission.treatment_date.year
+        and h.date.month == submission.treatment_date.month
+    )
+    if month_count >= monthly_limit:
+        signal = (
+            f"{month_count + 1} claims in "
+            f"{submission.treatment_date.strftime('%B %Y')} "
+            f"(including this one), exceeds monthly limit of {monthly_limit}."
         )
         signals.append(signal)
 
@@ -686,6 +701,7 @@ def _stage7_sub_limit_and_line_items(
 def _stage8_financial_calculation(
     policy: dict,
     submission: ClaimSubmission,
+    extractions: list[ExtractedDocumentData],
     base_amount: float,
     sub_limit: float | None,
     checks: list[PolicyCheckResult],
@@ -715,7 +731,7 @@ def _stage8_financial_calculation(
     hospital_name = (
         submission.hospital_name
         or next(
-            (ex.hospital_name for ex in [] if ex.hospital_name),  # extractor fills this
+            (ex.hospital_name for ex in extractions if ex.hospital_name),
             None,
         )
     )
@@ -801,6 +817,27 @@ async def run(
     fraud_flags: list[str] = []
     line_item_evals: list[LineItemEvaluation] = []
     financial_breakdown: FinancialBreakdown | None = None
+
+    # Submission rules — minimum claimable amount
+    # Note: deadline_days_from_treatment is not enforced here because
+    # ClaimSubmission has no submission_date field. Documented in architecture.md.
+    sub_rules = policy.get("submission_rules", {})
+    min_amount: float = sub_rules.get("minimum_claim_amount", 500)
+
+    if submission.claimed_amount < min_amount:
+        detail = (
+            f"Claimed amount ₹{submission.claimed_amount:,.0f} is below the "
+            f"minimum claimable amount of ₹{min_amount:,.0f}."
+        )
+        check = _check_result("submission_rules", False, detail,
+                              clause="submission_rules.minimum_claim_amount")
+        checks.append(check)
+        _emit(trace, check)
+        rejection_reasons.append("BELOW_MINIMUM_AMOUNT")
+        return PolicyEvaluationResult(
+            member_found=False, checks=checks,
+            rejection_reasons=rejection_reasons,
+        )
 
     # Stage 1 — Member & Policy Lookup (raises MemberNotFoundError if absent)
     member_ok, member = _stage1_member_lookup(
@@ -916,7 +953,7 @@ async def run(
     cat_key = submission.claim_category.value.lower()
     cat_policy = policy["opd_categories"].get(cat_key, {})
     financial_breakdown = _stage8_financial_calculation(
-        policy, submission, approved_base, sub_limit, checks, trace
+        policy, submission, extractions, approved_base, sub_limit, checks, trace
     )
 
     # Collect policy parameters for the decision agent
