@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: #F7F5F2;
+    color: #1A1714;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Tabular figures for all numbers in serif contexts */
+  .font-serif {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Amounts / claim values always tabular */
+  .tabular { font-variant-numeric: tabular-nums; }
+}
+
+@layer components {
+  .label {
+    @apply text-xs font-sans font-medium tracking-widest uppercase text-text-secondary;
+  }
+
+  .policy-ref {
+    @apply font-mono text-xs bg-bg px-1.5 py-0.5 rounded text-text-secondary border border-border;
+  }
+
+  .status-dot-ok       { @apply w-2 h-2 rounded-full bg-ok flex-shrink-0; }
+  .status-dot-warn     { @apply w-2 h-2 rounded-full bg-warn flex-shrink-0; }
+  .status-dot-fail     { @apply w-2 h-2 rounded-full bg-fail flex-shrink-0; }
+  .status-dot-degraded { @apply w-2 h-2 rounded-full bg-degraded flex-shrink-0; }
+}
