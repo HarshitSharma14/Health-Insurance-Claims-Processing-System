@@ -25,19 +25,74 @@ import logging
 from contextlib import asynccontextmanager
 from datetime import date
 from typing import Any, AsyncIterator, Literal
+import asyncio
+import base64
 
+import google.generativeai as genai
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.orchestrator.pipeline import process_claim
 from app.policy.loader import load_policy
-from app.schemas.claim import ClaimCategory, ClaimSubmission, UploadedDocument
+from app.schemas.claim import ClaimCategory, ClaimSubmission, DocumentType, UploadedDocument
 from app.schemas.decision import ClaimDecision
 from app.schemas.extraction import ExtractedDocumentData
 from app.schemas.verification import DocumentVerificationResult
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Quick document type classifier (runs before Stage 0 on real uploads)
+# ---------------------------------------------------------------------------
+
+def _classify_doc_sync(file_bytes: bytes, content_type: str) -> DocumentType:
+    """Ask Gemini what type of medical document this is. Fast, single-label."""
+    from app.config import settings
+    genai.configure(api_key=settings.gemini_api_key)
+    model = genai.GenerativeModel(
+        settings.classification_model,
+        generation_config=genai.GenerationConfig(
+            response_mime_type="application/json",
+            response_schema={
+                "type": "object",
+                "properties": {
+                    "document_type": {
+                        "type": "string",
+                        "enum": [
+                            "PRESCRIPTION", "HOSPITAL_BILL", "LAB_REPORT",
+                            "PHARMACY_BILL", "DENTAL_REPORT", "DIAGNOSTIC_REPORT",
+                            "DISCHARGE_SUMMARY", "UNKNOWN",
+                        ],
+                    }
+                },
+                "required": ["document_type"],
+            },
+            temperature=0.0,
+            max_output_tokens=64,
+        ),
+    )
+    encoded = base64.standard_b64encode(file_bytes).decode("ascii")
+    ct = content_type if content_type in {
+        "image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"
+    } else "image/jpeg"
+    prompt = (
+        "What type of Indian medical document is this? "
+        "Choose exactly one: PRESCRIPTION, HOSPITAL_BILL, LAB_REPORT, "
+        "PHARMACY_BILL, DENTAL_REPORT, DIAGNOSTIC_REPORT, DISCHARGE_SUMMARY, UNKNOWN."
+    )
+    try:
+        import json
+        resp = model.generate_content([{"inline_data": {"mime_type": ct, "data": encoded}}, prompt])
+        raw = json.loads(resp.text)
+        return DocumentType(raw.get("document_type", "UNKNOWN"))
+    except Exception:
+        return DocumentType.UNKNOWN
+
+
+async def _classify_document(file_bytes: bytes, content_type: str) -> DocumentType:
+    return await asyncio.to_thread(_classify_doc_sync, file_bytes, content_type)
 
 
 # ---------------------------------------------------------------------------
@@ -136,15 +191,27 @@ async def submit_claim(
     files: list[UploadFile] = File(..., description="One or more claim documents"),
 ) -> PipelineResponse:
     """Process a claim submitted as multipart form data with document uploads."""
-    documents: list[UploadedDocument] = []
+    # Read all files first
+    raw_uploads = []
     for upload in files:
         content = await upload.read()
+        raw_uploads.append((upload.filename, upload.content_type, content))
+
+    # Classify all documents concurrently before verification
+    doc_types = await asyncio.gather(*[
+        _classify_document(content, ct or "image/jpeg")
+        for _, ct, content in raw_uploads
+    ])
+
+    documents: list[UploadedDocument] = []
+    for (fname, ct, content), doc_type in zip(raw_uploads, doc_types):
         documents.append(
             UploadedDocument(
-                file_id=upload.filename or f"upload_{len(documents)}",
-                file_name=upload.filename,
-                content_type=upload.content_type,
+                file_id=fname or f"upload_{len(documents)}",
+                file_name=fname,
+                content_type=ct,
                 file_bytes=content,
+                document_type=doc_type,
             )
         )
 
