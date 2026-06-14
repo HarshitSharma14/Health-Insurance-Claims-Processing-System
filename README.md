@@ -13,7 +13,7 @@ Produces APPROVED / PARTIAL / REJECTED / MANUAL_REVIEW decisions with a full pro
 
 - **Python 3.12** (not 3.13/3.14 — `pydantic-core` has no wheels for those versions yet)
 - **Node.js 18+** (for the frontend)
-- An **Anthropic API key** (`ANTHROPIC_API_KEY`)
+- A **Gemini API key** (`GEMINI_API_KEY`) — free at https://aistudio.google.com/app/apikey
 
 ### 1. Clone and set up Python environment
 
@@ -29,7 +29,7 @@ pip install -e ".[dev]"
 
 ```bash
 cp .env.example .env
-# Edit .env and set:  ANTHROPIC_API_KEY=sk-ant-...
+# Edit .env and set:  GEMINI_API_KEY=AIza...
 ```
 
 ### 3. Run the backend

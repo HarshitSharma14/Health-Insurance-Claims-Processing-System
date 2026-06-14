@@ -7,17 +7,20 @@ and the demo video.
 
 ---
 
-## LLM model selection
-**Assumption:** Use `claude-sonnet-4-5` for document extraction/reasoning (vision-capable,
-supports multi-modal input) and `claude-haiku-4-5` for lightweight document-type
-classification (cheaper and faster for simple tasks).
+## LLM provider: Gemini Flash
+**Assumption:** Use Google Gemini (`gemini-3.1-flash-lite`) for both document extraction
+and document-type classification. The extraction agent uses Gemini's vision input
+(base64 image / PDF) with `response_schema` for forced structured JSON output.
 
-**Why:** Extraction needs high accuracy on messy real-world documents; classification
-is a simpler task that doesn't justify the cost of Sonnet. Both are in the
-`claude-sonnet-4-x` / `claude-haiku-4-x` families specified in tech-stack.md.
+**Why:** Gemini 3.1 Flash Lite is free-tier, vision-capable, and supports
+`response_schema` for structured output — eliminating the need to parse free-text
+responses. The Anthropic SDK was originally scaffolded but was swapped for Gemini to
+avoid API costs during development and evaluation.
 
-**Would change:** Benchmark both models on a held-out document set to validate the
-cost/accuracy tradeoff before committing to the split.
+**Would change:** Benchmark against Claude Sonnet (Anthropic) for accuracy on messy
+handwritten Indian medical documents — Flash Lite prioritises speed and cost over
+accuracy. The extractor is designed so the LLM backend can be swapped by replacing
+`_call_gemini_sync` without changing the agent interface.
 
 ---
 
