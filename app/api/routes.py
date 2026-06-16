@@ -35,7 +35,7 @@ from pydantic import BaseModel, Field
 
 from app.orchestrator.pipeline import process_claim
 from app.policy.loader import load_policy
-from app.schemas.claim import ClaimCategory, ClaimSubmission, DocumentType, UploadedDocument
+from app.schemas.claim import ClaimCategory, ClaimSubmission, ClaimsHistoryEntry, DocumentType, UploadedDocument
 from app.schemas.decision import ClaimDecision
 from app.schemas.extraction import ExtractedDocumentData
 from app.schemas.verification import DocumentVerificationResult
@@ -187,9 +187,15 @@ async def submit_claim(
     policy_id: str = Form(...),
     claim_category: ClaimCategory = Form(...),
     treatment_date: str = Form(..., description="ISO 8601 date e.g. 2024-11-01"),
+    submission_date: str | None = Form(
+        None, description="ISO 8601 date the claim was filed; defaults to today"
+    ),
     claimed_amount: float = Form(..., gt=0),
     hospital_name: str | None = Form(None),
     simulate_component_failure: bool = Form(False),
+    claims_history_json: str | None = Form(
+        None, description="Optional JSON array of prior claims [{claim_id,date,amount,provider}]"
+    ),
     files: list[UploadFile] = File(..., description="One or more claim documents"),
 ) -> PipelineResponse:
     """Process a claim submitted as multipart form data with document uploads.
@@ -240,16 +246,41 @@ async def submit_claim(
         )
 
     try:
+        claims_history: list[ClaimsHistoryEntry] = []
+        if claims_history_json:
+            import json as _json
+            try:
+                raw_history = _json.loads(claims_history_json)
+                for h in raw_history:
+                    claims_history.append(
+                        ClaimsHistoryEntry(
+                            claim_id=h["claim_id"],
+                            date=date.fromisoformat(h["date"]),
+                            amount=float(h["amount"]),
+                            provider=h.get("provider"),
+                        )
+                    )
+            except (ValueError, KeyError, TypeError) as exc:
+                raise HTTPException(
+                    status_code=400, detail=f"Invalid claims_history_json: {exc}"
+                ) from exc
+
         submission = ClaimSubmission(
             member_id=member_id,
             policy_id=policy_id,
             claim_category=claim_category,
             treatment_date=date.fromisoformat(treatment_date),
+            submission_date=(
+                date.fromisoformat(submission_date) if submission_date else date.today()
+            ),
             claimed_amount=claimed_amount,
             hospital_name=hospital_name,
             simulate_component_failure=simulate_component_failure,
+            claims_history=claims_history,
             documents=documents,
         )
+    except HTTPException:
+        raise
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

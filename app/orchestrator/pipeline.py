@@ -58,6 +58,116 @@ _STAGE = "orchestrator"
 _COMPONENT = "ClaimOrchestrator"
 
 
+def _post_extraction_verification(
+    submission: ClaimSubmission,
+    extractions: list[ExtractedDocumentData],
+    trace: ClaimTrace,
+) -> DocumentVerificationResult | None:
+    """Verification checks that can only run once documents are extracted.
+
+    Stage 0 runs before extraction and can only compare metadata supplied at
+    upload time. On the live path (real uploads) patient names and legibility
+    are unknown until the LLM has read each document, so we re-run two checks
+    here using the extracted content (see decision-logic.md Stage 0, notes 2 & 3):
+
+      * Legibility — a REQUIRED document the model could read but found
+        illegible (is_partial with 0 < confidence < 0.6). A hard extraction
+        failure (confidence == 0.0, e.g. timeout or simulate_component_failure)
+        is NOT treated as unreadable — that degrades toward MANUAL_REVIEW
+        instead, per error-handling.md.
+      * Patient identity — extracted patient_name disagrees across documents
+        (no shared name token), surfacing the specific names found.
+
+    Returns a DocumentVerificationResult(passed=False) to short-circuit, or
+    None to proceed to policy evaluation.
+    """
+    from app.policy.loader import get_policy
+    from app.schemas.verification import VerificationFailureType
+
+    policy = get_policy()
+    category = submission.claim_category.value
+    required = set(
+        policy.get("document_requirements", {}).get(category, {}).get("required", [])
+    )
+    upload_by_id = {d.file_id: d for d in submission.documents}
+
+    # ── Legibility (skip entirely when a component failure is being simulated)
+    if not submission.simulate_component_failure:
+        for ex in extractions:
+            if ex.is_partial and 0.0 < ex.overall_confidence < 0.6:
+                up = upload_by_id.get(ex.file_id)
+                declared = up.document_type.value if up else ex.document_type.value
+                if required and declared not in required:
+                    continue  # an optional doc being unreadable doesn't block
+                name = (up.file_name if up and up.file_name else ex.file_id)
+                msg = (
+                    f"The document '{name}' could not be read clearly "
+                    f"(extraction confidence {ex.overall_confidence:.0%}). "
+                    "Please re-upload a clear, legible photo or scan of that document."
+                )
+                append_event(
+                    trace, stage="document_verification", component=_COMPONENT,
+                    status="failed",
+                    summary=f"Post-extraction legibility check failed: '{name}' unreadable.",
+                    details={"check": "legibility_post_extraction", "file_id": ex.file_id,
+                             "confidence": ex.overall_confidence, "message": msg},
+                )
+                return DocumentVerificationResult(
+                    passed=False,
+                    required_documents=[],
+                    received_documents=[d.document_type for d in submission.documents],
+                    missing_documents=[],
+                    unreadable_documents=[ex.file_id],
+                    failure_type=VerificationFailureType.UNREADABLE_DOCUMENT,
+                    message=msg,
+                )
+
+    # ── Cross-document patient identity (token-overlap tolerant)
+    named = [
+        (upload_by_id.get(ex.file_id), ex.patient_name)
+        for ex in extractions
+        if ex.patient_name and not ex.is_partial
+    ]
+    if len(named) >= 2:
+        def tokens(n: str) -> set[str]:
+            return {t for t in n.lower().replace(".", " ").split() if len(t) > 2}
+
+        names = [n for _, n in named]
+        # Mismatch only if some pair shares NO name token at all.
+        mismatch = False
+        for i in range(len(names)):
+            for j in range(i + 1, len(names)):
+                if not (tokens(names[i]) & tokens(names[j])):
+                    mismatch = True
+        if mismatch:
+            parts = "; ".join(
+                f"'{n}' (on {up.file_name if up and up.file_name else 'document'})"
+                for up, n in named
+            )
+            msg = (
+                f"The documents appear to belong to different patients: {parts}. "
+                "Please confirm these documents all belong to the same person "
+                "and re-upload the correct documents."
+            )
+            append_event(
+                trace, stage="document_verification", component=_COMPONENT,
+                status="failed",
+                summary=f"Post-extraction patient identity check failed: {len(set(names))} names.",
+                details={"check": "patient_identity_post_extraction",
+                         "names": names, "message": msg},
+            )
+            return DocumentVerificationResult(
+                passed=False,
+                required_documents=[],
+                received_documents=[d.document_type for d in submission.documents],
+                missing_documents=[],
+                failure_type=VerificationFailureType.PATIENT_MISMATCH,
+                message=msg,
+            )
+
+    return None
+
+
 async def process_claim(
     submission: ClaimSubmission,
     pre_extracted_documents: list[ExtractedDocumentData] | None = None,
@@ -233,6 +343,25 @@ async def process_claim(
                     "degraded_file_ids": [ex.file_id for ex in extractions if ex.is_partial],
                 },
             )
+
+    # ------------------------------------------------------------------
+    # Post-extraction verification (live path): legibility + patient identity
+    # can only be assessed once the documents have been read.
+    # ------------------------------------------------------------------
+    post_verify = _post_extraction_verification(submission, extractions, trace)
+    if post_verify is not None:
+        append_event(
+            trace, stage=_STAGE, component=_COMPONENT, status="failed",
+            summary=(
+                f"Pipeline halted after extraction: {post_verify.failure_type}. "
+                f"{post_verify.message}"
+            ),
+            details={
+                "failure_type": post_verify.failure_type.value if post_verify.failure_type else None,
+                "message": post_verify.message,
+            },
+        )
+        return post_verify
 
     # ------------------------------------------------------------------
     # Stages 1–8 — Policy Evaluation
