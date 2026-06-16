@@ -1,9 +1,24 @@
 import React, { useState, useRef } from "react";
 import {
-  Loader2, Stethoscope, FlaskConical, Pill, Smile, Eye, Leaf, CheckCircle2, Building2, Play, FileText,
+  Loader2, Stethoscope, FlaskConical, Pill, Smile, Eye, Leaf, CheckCircle2, Building2, Play, FileText, ExternalLink,
 } from "lucide-react";
 import type { PipelineResponse } from "../types";
 import { TEST_CASES, TC_DESCRIPTIONS, TC_EXPECTED, FILL_DOCS } from "../test-cases";
+
+// Open a File (image or PDF) in a new browser tab. A temporary anchor click is
+// used instead of window.open(), which browsers block or silently fail on blob:
+// URLs. The object URL is released after the new tab has had time to load.
+function openFileInNewTab(file: File): void {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement("a");
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
 import { LoadingStages } from "./LoadingStages";
 import { DocumentSlots, buildSlots, transitionSlots, type SlotState } from "./DocumentSlots";
 
@@ -459,7 +474,16 @@ export function ClaimSubmissionForm({ onResult }: Props) {
                 <div key={i} className="flex items-center gap-2 px-3 py-2 rounded border border-border bg-paper">
                   <FileText size={11} className="text-ink-muted flex-shrink-0" />
                   <span className="font-mono text-[10px] text-ink">{d.type.replace(/_/g, " ")}</span>
-                  <span className="font-mono text-xs text-ink-light flex-1 truncate">{d.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => openFileInNewTab(d.file)}
+                    title="Open in a new tab"
+                    className="font-mono text-xs text-ink-light flex-1 truncate text-left flex items-center gap-1
+                      hover:text-coral hover:underline transition-colors"
+                  >
+                    <span className="truncate">{d.name}</span>
+                    <ExternalLink size={10} className="flex-shrink-0 opacity-60" />
+                  </button>
                   <span className="text-[10px] text-ink-muted tabular flex-shrink-0">
                     {(d.file.size / 1024).toFixed(0)} KB
                   </span>

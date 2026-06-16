@@ -15,7 +15,7 @@
  *     The user must explicitly keep (confirm) or remove (replace) the file.
  */
 import React, { useRef, useState } from "react";
-import { Upload, X, FileText, FileImage, AlertTriangle, Check } from "lucide-react";
+import { Upload, X, FileText, FileImage, AlertTriangle, Check, ExternalLink } from "lucide-react";
 
 // ── Document requirements (mirrors policy_terms.json) ────────────────────────
 
@@ -154,6 +154,24 @@ function DocumentSlot({ slot, onFile, onRemove, onConfirm }: SlotProps) {
     if (f) onFile(f);
   };
 
+  // Open the uploaded file (image or PDF) in a new browser tab.
+  // A temporary anchor click is used rather than window.open(): browsers block
+  // or silently fail window.open() on blob: URLs (especially with a "noopener"
+  // features string), whereas an <a target="_blank"> click opens them reliably.
+  const openFile = () => {
+    if (!slot.file) return;
+    const url = URL.createObjectURL(slot.file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Release the object URL once the new tab has had time to load it.
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+
   return (
     <div className={[
       "rounded border transition-colors",
@@ -209,7 +227,16 @@ function DocumentSlot({ slot, onFile, onRemove, onConfirm }: SlotProps) {
       {hasFile ? (
         <div className="flex items-center gap-2 px-3 py-2">
           <FileIcon name={slot.file!.name} />
-          <span className="font-mono text-xs text-ink flex-1 truncate">{slot.file!.name}</span>
+          <button
+            type="button"
+            onClick={openFile}
+            title="Open in a new tab"
+            className="font-mono text-xs text-ink flex-1 truncate text-left flex items-center gap-1
+              hover:text-coral hover:underline transition-colors"
+          >
+            <span className="truncate">{slot.file!.name}</span>
+            <ExternalLink size={10} className="flex-shrink-0 opacity-60" />
+          </button>
           <span className="text-[10px] text-ink-muted tabular flex-shrink-0">
             {(slot.file!.size / 1024).toFixed(0)} KB
           </span>
