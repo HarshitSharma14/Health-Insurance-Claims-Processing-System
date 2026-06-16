@@ -94,3 +94,47 @@ as the acceptance tests for the rules engine. The eval harness feeds pre extract
 for the cases that aren't about document reading (TC004 onward), which keeps the run fast
 and deterministic and means a mismatch would point at the policy or decision logic rather
 than at OCR noise.
+
+## Extra cases (added beyond the required 12)
+
+The 12 cases above are the ones the assignment ships. While building the system I
+noticed a few behaviours that are fully implemented but that none of the 12 actually
+exercise, so I added four more cases to cover them. They live in `eval/extra_cases.json`
+and run through the same harness, and they show up in their own section beneath the core
+12 in `eval/eval_report.md`. All four pass.
+
+| Case | What it tests | Expected | Got | Match |
+|------|---------------|----------|-----|-------|
+| EC001 | Member id not in the roster | MANUAL_REVIEW | MANUAL_REVIEW | yes |
+| EC002 | Claim below the minimum amount | REJECTED, BELOW_MINIMUM_AMOUNT | REJECTED, BELOW_MINIMUM_AMOUNT | yes |
+| EC003 | Vision bill with an excluded LASIK line | PARTIAL, 1000 | PARTIAL, 1000 | yes |
+| EC004 | Filed past the submission deadline | REJECTED, SUBMISSION_DEADLINE_EXCEEDED | REJECTED, SUBMISSION_DEADLINE_EXCEEDED | yes |
+
+### EC001, member not found
+A consultation claim with correct documents but a member id (EMP999) that isn't in the
+policy roster. Document verification passes because the documents themselves are fine, so
+the failure happens at the member lookup. The pipeline does not crash. It routes to manual
+review and says the member id was not found. This is the path the original 12 never hit,
+since every one of them uses a real member.
+
+### EC002, below the minimum amount
+A pharmacy claim for 300 rupees against a policy minimum of 500. The submission-rules
+check catches it early and rejects with BELOW_MINIMUM_AMOUNT. The trace states the actual
+numbers (claimed 300, minimum 500).
+
+### EC003, vision partial with LASIK excluded
+A vision bill with an eye examination (covered, 1000) and a LASIK procedure (excluded,
+4000). The system approves only the eye examination and itemises why LASIK was dropped.
+This is the same line-item logic TC006 tests for dental, but on the vision category, which
+the core suite never touches.
+
+### EC004, late submission
+A consultation treated on 2024-09-01 but filed on 2024-11-01, well past the 30 day
+deadline. Rejected with SUBMISSION_DEADLINE_EXCEEDED, and the trace names both the deadline
+and the actual submission date. Wiring this case in needed the harness to accept an explicit
+submission date, since the other cases just file same-day.
+
+One small thing these extra cases surfaced: the rejection message for the submission-rules
+failures is a touch generic in the decision's top-line reason field, even though the trace
+event itself carries the specific numbers. Worth tightening the reason text for those two
+codes, but it doesn't affect the outcome and I left the decision logic alone.

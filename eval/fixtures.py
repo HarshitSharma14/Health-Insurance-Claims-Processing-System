@@ -153,12 +153,19 @@ def build_inputs(
 
     # Submission
     treatment_date = date.fromisoformat(inp["treatment_date"])
+    # Default the submission date to the treatment date (same-day filing) unless
+    # the case explicitly provides one (e.g. to test the filing-deadline rule).
+    submission_date = (
+        date.fromisoformat(inp["submission_date"])
+        if inp.get("submission_date")
+        else treatment_date
+    )
     submission = ClaimSubmission(
         member_id=inp["member_id"],
         policy_id=inp["policy_id"],
         claim_category=ClaimCategory(inp["claim_category"]),
         treatment_date=treatment_date,
-        submission_date=treatment_date,  # eval harness: treat submission as same-day
+        submission_date=submission_date,
         claimed_amount=float(inp["claimed_amount"]),
         hospital_name=inp.get("hospital_name"),
         ytd_claims_amount=float(inp["ytd_claims_amount"]) if "ytd_claims_amount" in inp else None,

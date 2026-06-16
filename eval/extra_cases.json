@@ -1,0 +1,173 @@
+{
+  "version": "1.0",
+  "description": "Author-added cases beyond the 12 in test_cases.json. These exercise behaviour that is implemented in the pipeline but not covered by the original suite: the member-not-found path, the submission-rules stage (minimum amount and filing deadline), and vision line-item exclusion (the original suite only tests dental line items).",
+  "extra_cases": [
+    {
+      "case_id": "EC001",
+      "case_name": "Member Not Found",
+      "description": "A valid-looking consultation claim, but the member_id is not in the policy roster. Documents are correct so verification passes; the member lookup is what fails.",
+      "input": {
+        "member_id": "EMP999",
+        "policy_id": "PLUM_GHI_2024",
+        "claim_category": "CONSULTATION",
+        "treatment_date": "2024-11-01",
+        "claimed_amount": 1500,
+        "documents": [
+          {
+            "file_id": "E001",
+            "actual_type": "PRESCRIPTION",
+            "content": {
+              "doctor_name": "Dr. A. Rao",
+              "patient_name": "Unknown Member",
+              "diagnosis": "Viral Fever",
+              "date": "2024-11-01"
+            }
+          },
+          {
+            "file_id": "E002",
+            "actual_type": "HOSPITAL_BILL",
+            "content": {
+              "patient_name": "Unknown Member",
+              "total": 1500,
+              "line_items": [{ "description": "Consultation Fee", "amount": 1500 }]
+            }
+          }
+        ]
+      },
+      "expected": {
+        "decision": "MANUAL_REVIEW",
+        "system_must": [
+          "Not crash when the member is absent from the roster",
+          "Route to manual review rather than approving or rejecting",
+          "State that the member id was not found"
+        ]
+      }
+    },
+    {
+      "case_id": "EC002",
+      "case_name": "Below Minimum Claim Amount",
+      "description": "A pharmacy claim for 300 rupees, below the policy minimum claimable amount of 500.",
+      "input": {
+        "member_id": "EMP004",
+        "policy_id": "PLUM_GHI_2024",
+        "claim_category": "PHARMACY",
+        "treatment_date": "2024-10-25",
+        "claimed_amount": 300,
+        "documents": [
+          {
+            "file_id": "E003",
+            "actual_type": "PRESCRIPTION",
+            "content": {
+              "doctor_name": "Dr. M. Iyer",
+              "patient_name": "Sneha Reddy",
+              "diagnosis": "Common Cold"
+            }
+          },
+          {
+            "file_id": "E004",
+            "actual_type": "PHARMACY_BILL",
+            "content": {
+              "patient_name": "Sneha Reddy",
+              "total": 300,
+              "line_items": [{ "description": "Cetirizine 10mg", "amount": 300 }]
+            }
+          }
+        ]
+      },
+      "expected": {
+        "decision": "REJECTED",
+        "rejection_reasons": ["BELOW_MINIMUM_AMOUNT"],
+        "system_must": [
+          "Reject claims below the minimum claimable amount",
+          "State the minimum and the claimed amount"
+        ]
+      }
+    },
+    {
+      "case_id": "EC003",
+      "case_name": "Vision Partial — LASIK Excluded",
+      "description": "A vision claim with a covered eye examination and an excluded LASIK procedure on the same bill. Only the eye examination should be approved.",
+      "input": {
+        "member_id": "EMP002",
+        "policy_id": "PLUM_GHI_2024",
+        "claim_category": "VISION",
+        "treatment_date": "2024-11-05",
+        "claimed_amount": 5000,
+        "documents": [
+          {
+            "file_id": "E005",
+            "actual_type": "PRESCRIPTION",
+            "content": {
+              "doctor_name": "Dr. L. Menon",
+              "patient_name": "Priya Singh",
+              "diagnosis": "Myopia"
+            }
+          },
+          {
+            "file_id": "E006",
+            "actual_type": "HOSPITAL_BILL",
+            "content": {
+              "patient_name": "Priya Singh",
+              "line_items": [
+                { "description": "Eye Examination", "amount": 1000 },
+                { "description": "LASIK Surgery", "amount": 4000 }
+              ],
+              "total": 5000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "decision": "PARTIAL",
+        "approved_amount": 1000,
+        "system_must": [
+          "Approve the covered eye examination",
+          "Exclude the LASIK procedure at the line-item level",
+          "State the reason for the excluded item"
+        ]
+      }
+    },
+    {
+      "case_id": "EC004",
+      "case_name": "Late Submission — Filing Deadline Exceeded",
+      "description": "A consultation treated on 2024-09-01 but submitted on 2024-11-01, which is more than 30 days after treatment.",
+      "input": {
+        "member_id": "EMP001",
+        "policy_id": "PLUM_GHI_2024",
+        "claim_category": "CONSULTATION",
+        "treatment_date": "2024-09-01",
+        "submission_date": "2024-11-01",
+        "claimed_amount": 1500,
+        "documents": [
+          {
+            "file_id": "E007",
+            "actual_type": "PRESCRIPTION",
+            "content": {
+              "doctor_name": "Dr. A. Sharma",
+              "patient_name": "Rajesh Kumar",
+              "diagnosis": "Viral Fever",
+              "date": "2024-09-01"
+            }
+          },
+          {
+            "file_id": "E008",
+            "actual_type": "HOSPITAL_BILL",
+            "content": {
+              "patient_name": "Rajesh Kumar",
+              "total": 1500,
+              "line_items": [{ "description": "Consultation Fee", "amount": 1500 }]
+            }
+          }
+        ]
+      },
+      "expected": {
+        "decision": "REJECTED",
+        "rejection_reasons": ["SUBMISSION_DEADLINE_EXCEEDED"],
+        "system_must": [
+          "Reject claims filed after the submission deadline",
+          "State the deadline and the actual submission date"
+        ]
+      }
+    }
+  ]
+}

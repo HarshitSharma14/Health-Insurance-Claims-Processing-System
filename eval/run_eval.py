@@ -15,6 +15,7 @@ Output:
 from __future__ import annotations
 
 import asyncio
+import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -240,41 +241,89 @@ def _render_case(
 # Main
 # ---------------------------------------------------------------------------
 
+async def _run_one(
+    tc: dict[str, Any],
+) -> tuple[dict, DocumentVerificationResult | ClaimDecision, bool, list[str]]:
+    """Run a single case through the pipeline and grade it."""
+    submission, pre_extracted = build_inputs(tc)
+    try:
+        result = await process_claim(
+            submission,
+            pre_extracted_documents=pre_extracted,
+        )
+    except Exception as exc:
+        # Unexpected crash — create a synthetic failure result
+        from app.trace.trace import new_trace
+        trace = new_trace(tc["case_id"])
+        result = ClaimDecision(
+            decision="MANUAL_REVIEW",
+            approved_amount=None,
+            reason=f"PIPELINE CRASHED: {exc}",
+            confidence_score=0.0,
+            trace=trace,
+        )
+    passed, failures = _passes(tc, result)
+    return tc, result, passed, failures
+
+
+async def _run_cases(
+    cases: list[dict[str, Any]], label: str,
+) -> list[tuple[dict, DocumentVerificationResult | ClaimDecision, bool, list[str]]]:
+    """Run a list of cases, printing progress, and return the graded results."""
+    print(f"\nRunning {label}...\n")
+    results: list[tuple] = []
+    for tc in cases:
+        print(f"  [{tc['case_id']}] {tc['case_name']}...", end=" ", flush=True)
+        item = await _run_one(tc)
+        results.append(item)
+        print("PASS" if item[2] else f"FAIL — {'; '.join(item[3])}")
+    return results
+
+
+def _summary_rows(results: list[tuple]) -> list[str]:
+    """Render the summary-table body rows for a set of results."""
+    rows: list[str] = []
+    for tc, result, passed, _ in results:
+        exp_dec = tc["expected"].get("decision", "null (verification stop)")
+        act_dec = _actual_decision(result)
+        act_dec_str = act_dec if act_dec is not None else "null (verification stop)"
+        verdict_icon = "✅ PASS" if passed else "❌ FAIL"
+        rows.append(
+            f"| `{tc['case_id']}` | {tc['case_name']} "
+            f"| `{exp_dec}` | `{act_dec_str}` | {verdict_icon} |"
+        )
+    return rows
+
+
+def _summary_header() -> list[str]:
+    return [
+        "| Case ID | Name | Expected Decision | Actual Decision | Verdict |",
+        "|---------|------|-------------------|-----------------|---------|",
+    ]
+
+
+def _load_extra_cases() -> list[dict[str, Any]]:
+    """Load author-added cases from eval/extra_cases.json if present."""
+    extra_path = REPO_ROOT / "eval" / "extra_cases.json"
+    if not extra_path.exists():
+        return []
+    with open(extra_path, encoding="utf-8") as f:
+        return json.load(f).get("extra_cases", [])
+
+
 async def run_eval() -> None:
     load_policy(REPO_ROOT / "policy_terms.json")
     test_cases = load_test_cases()
+    extra_cases = _load_extra_cases()
 
-    results_data: list[tuple[dict, DocumentVerificationResult | ClaimDecision, bool, list[str]]] = []
+    core_results = await _run_cases(test_cases, "core suite (test_cases.json)")
+    extra_results = (
+        await _run_cases(extra_cases, "extra cases (extra_cases.json)")
+        if extra_cases else []
+    )
 
-    print("\nRunning evaluation harness against test_cases.json...\n")
-
-    for tc in test_cases:
-        case_id = tc["case_id"]
-        case_name = tc["case_name"]
-        print(f"  [{case_id}] {case_name}...", end=" ", flush=True)
-
-        submission, pre_extracted = build_inputs(tc)
-
-        try:
-            result = await process_claim(
-                submission,
-                pre_extracted_documents=pre_extracted,
-            )
-        except Exception as exc:
-            # Unexpected crash — create a synthetic failure result
-            from app.trace.trace import new_trace
-            trace = new_trace(case_id)
-            result = ClaimDecision(
-                decision="MANUAL_REVIEW",
-                approved_amount=None,
-                reason=f"PIPELINE CRASHED: {exc}",
-                confidence_score=0.0,
-                trace=trace,
-            )
-
-        passed, failures = _passes(tc, result)
-        results_data.append((tc, result, passed, failures))
-        print("PASS" if passed else f"FAIL — {'; '.join(failures)}")
+    core_pass = sum(1 for _, _, p, _ in core_results if p)
+    extra_pass = sum(1 for _, _, p, _ in extra_results if p)
 
     # ------------------------------------------------------------------
     # Build eval_report.md
@@ -284,28 +333,20 @@ async def run_eval() -> None:
         "",
         f"_Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_",
         "",
-        f"**Score: {sum(1 for _, _, p, _ in results_data if p)}/{len(results_data)} cases passing**",
+        f"**Core suite: {core_pass}/{len(core_results)} cases passing**",
+    ]
+    if extra_results:
+        report_lines.append(
+            f"**Extra cases: {extra_pass}/{len(extra_results)} cases passing**"
+        )
+    report_lines += [
         "",
         "---",
         "",
         "## Summary Table",
         "",
-        "| Case ID | Name | Expected Decision | Actual Decision | Verdict |",
-        "|---------|------|-------------------|-----------------|---------|",
-    ]
-
-    for tc, result, passed, _ in results_data:
-        exp_dec = tc["expected"].get("decision", "null (verification stop)")
-        act_dec = _actual_decision(result)
-        act_dec_str = act_dec if act_dec is not None else "null (verification stop)"
-        verdict_icon = "✅ PASS" if passed else "❌ FAIL"
-        row = (
-            f"| `{tc['case_id']}` | {tc['case_name']} "
-            f"| `{exp_dec}` | `{act_dec_str}` | {verdict_icon} |"
-        )
-        report_lines.append(row)
-
-    report_lines += [
+        *_summary_header(),
+        *_summary_rows(core_results),
         "",
         "---",
         "",
@@ -313,8 +354,35 @@ async def run_eval() -> None:
         "",
     ]
 
-    for idx, (tc, result, passed, failures) in enumerate(results_data, start=1):
+    for idx, (tc, result, passed, failures) in enumerate(core_results, start=1):
         report_lines.append(_render_case(tc, result, passed, failures, idx))
+
+    # ------------------------------------------------------------------
+    # Extra cases section (appended beneath the core suite)
+    # ------------------------------------------------------------------
+    if extra_results:
+        report_lines += [
+            "",
+            "# Extra Cases (author-added)",
+            "",
+            "These cases are not part of `test_cases.json`. They cover behaviour "
+            "that is implemented in the pipeline but not exercised by the core "
+            "suite: the member-not-found path, the submission-rules stage "
+            "(minimum amount and filing deadline), and vision line-item "
+            "exclusion. See `eval/extra_cases.json` for the inputs.",
+            "",
+            "## Summary Table",
+            "",
+            *_summary_header(),
+            *_summary_rows(extra_results),
+            "",
+            "---",
+            "",
+            "## Per-Case Detail",
+            "",
+        ]
+        for idx, (tc, result, passed, failures) in enumerate(extra_results, start=1):
+            report_lines.append(_render_case(tc, result, passed, failures, idx))
 
     report_path = REPO_ROOT / "eval" / "eval_report.md"
     report_path.write_text("\n".join(report_lines), encoding="utf-8")
@@ -322,15 +390,19 @@ async def run_eval() -> None:
     # ------------------------------------------------------------------
     # Stdout summary
     # ------------------------------------------------------------------
-    n_pass = sum(1 for _, _, p, _ in results_data if p)
-    n_total = len(results_data)
+    all_results = core_results + extra_results
+    n_pass = sum(1 for _, _, p, _ in all_results if p)
+    n_total = len(all_results)
 
     print("\n" + "=" * 60)
-    print(f"  EVAL SUMMARY: {n_pass}/{n_total} PASSING")
+    print(f"  EVAL SUMMARY: {n_pass}/{n_total} PASSING "
+          f"(core {core_pass}/{len(core_results)}"
+          + (f", extra {extra_pass}/{len(extra_results)}" if extra_results else "")
+          + ")")
     print("=" * 60)
     print(f"\n{'Case ID':<8} {'Name':<45} {'Result'}")
     print("-" * 70)
-    for tc, result, passed, _ in results_data:
+    for tc, result, passed, _ in all_results:
         verdict = "PASS" if passed else "FAIL"
         print(f"{tc['case_id']:<8} {tc['case_name'][:44]:<45} {verdict}")
     print("-" * 70)

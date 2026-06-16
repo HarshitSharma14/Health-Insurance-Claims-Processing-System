@@ -1,8 +1,9 @@
 # Plum Claims Processing — Eval Report
 
-_Generated: 2026-06-16 20:44:05_
+_Generated: 2026-06-16 21:37:32_
 
-**Score: 12/12 cases passing**
+**Core suite: 12/12 cases passing**
+**Extra cases: 4/4 cases passing**
 
 ---
 
@@ -118,22 +119,22 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP001', category 'CONSULTATION', amount ₹1,500.00. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP001' (Rajesh Kumar) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-11-01 is in range. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Viral Fever'. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-11-01). No specific condition waiting period applies. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'CONSULTATION'. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for CONSULTATION: approved base amount ₹1,500.00 |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Approved amount ₹1,500 is within the per-claim limit of ₹5,000. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹1,500.00 → co-pay 10% (₹150.00) → final ₹1,350.00 |
-| `15:14:05.099` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: APPROVED (confidence=1.00). Claim approved for ₹1,350.00. Co-pay of 10.0% (₹150.00) deducted. |
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: APPROVED, approved_amount: 1350.0, confidence: 1.00. |
+| `16:07:32.754` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP001', category 'CONSULTATION', amount ₹1,500.00. |
+| `16:07:32.754` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
+| `16:07:32.754` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.754` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.754` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
+| `16:07:32.754` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.754` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP001' (Rajesh Kumar) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-11-01 is in range. |
+| `16:07:32.754` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Viral Fever'. |
+| `16:07:32.754` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-11-01). No specific condition waiting period applies. |
+| `16:07:32.754` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'CONSULTATION'. |
+| `16:07:32.754` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
+| `16:07:32.754` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for CONSULTATION: approved base amount ₹1,500.00 |
+| `16:07:32.754` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Approved amount ₹1,500 is within the per-claim limit of ₹5,000. |
+| `16:07:32.754` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹1,500.00 → co-pay 10% (₹150.00) → final ₹1,350.00 |
+| `16:07:32.754` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: APPROVED (confidence=1.00). Claim approved for ₹1,350.00. Co-pay of 10.0% (₹150.00) deducted. |
+| `16:07:32.754` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: APPROVED, approved_amount: 1350.0, confidence: 1.00. |
 
 **Final explanation:** Decision: APPROVED. Claim approved for ₹1,350.00. Co-pay of 10.0% (₹150.00) deducted. Co-pay 10.0% deducted (₹150.00 → final ₹1,350.00). Confidence score: 1.00.
 
@@ -159,17 +160,17 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP005', category 'CONSULTATION', amount ₹3,000.00. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP005' (Vikram Joshi) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-15 is in range. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Type 2 Diabetes Mellitus'. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Diagnosis/treatment matches condition 'diabetes' (waiting period: 90 days). Treatment date 2024-10-15 < eligibility date 2024-11-30. Member will be eligible from 2024-11-30. |
-| `15:14:05.099` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=1.00). Diagnosis/treatment matches condition 'diabetes' (waiting period: 90 days). Treatment date 2024-10-15 < eligibility date |
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 1.00. |
+| `16:07:32.754` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP005', category 'CONSULTATION', amount ₹3,000.00. |
+| `16:07:32.755` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
+| `16:07:32.755` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.755` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.755` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
+| `16:07:32.755` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP005' (Vikram Joshi) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-15 is in range. |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Type 2 Diabetes Mellitus'. |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Diagnosis/treatment matches condition 'diabetes' (waiting period: 90 days). Treatment date 2024-10-15 < eligibility date 2024-11-30. Member will be eligible from 2024-11-30. |
+| `16:07:32.755` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=1.00). Diagnosis/treatment matches condition 'diabetes' (waiting period: 90 days). Treatment date 2024-10-15 < eligibility date |
+| `16:07:32.755` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 1.00. |
 
 **Final explanation:** Decision: REJECTED. Diagnosis/treatment matches condition 'diabetes' (waiting period: 90 days). Treatment date 2024-10-15 < eligibility date 2024-11-30. Member will be eligible from 2024-11-30. Confidence score: 1.00.
 
@@ -201,22 +202,22 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP002', category 'DENTAL', amount ₹12,000.00. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: hospital bill present for DENTAL claim. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 1 document(s) accepted for DENTAL claim. |
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 1 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP002' (Priya Singh) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-15 is in range. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No diagnosis/treatment text available — exclusion check skipped. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-10-15). No specific condition waiting period applies. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'DENTAL'. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for DENTAL: approved base amount ₹8,000.00 (sub_limit ₹10,000 applied). 1 line item(s) excluded. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Per-claim limit check skipped for DENTAL with line-item evaluation (sub_limit governs). |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹8,000.00 → no co-pay → final ₹8,000.00 |
-| `15:14:05.099` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: PARTIAL (confidence=1.00). Claim partially approved. Excluded line items: 'Teeth Whitening' (₹4,000.00). Approved: ₹8,000.00. |
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: PARTIAL, approved_amount: 8000.0, confidence: 1.00. |
+| `16:07:32.755` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP002', category 'DENTAL', amount ₹12,000.00. |
+| `16:07:32.755` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: hospital bill present for DENTAL claim. |
+| `16:07:32.755` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.755` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.755` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 1 document(s) accepted for DENTAL claim. |
+| `16:07:32.755` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 1 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP002' (Priya Singh) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-15 is in range. |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No diagnosis/treatment text available — exclusion check skipped. |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-10-15). No specific condition waiting period applies. |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'DENTAL'. |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for DENTAL: approved base amount ₹8,000.00 (sub_limit ₹10,000 applied). 1 line item(s) excluded. |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Per-claim limit check skipped for DENTAL with line-item evaluation (sub_limit governs). |
+| `16:07:32.755` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹8,000.00 → no co-pay → final ₹8,000.00 |
+| `16:07:32.755` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: PARTIAL (confidence=1.00). Claim partially approved. Excluded line items: 'Teeth Whitening' (₹4,000.00). Approved: ₹8,000.00. |
+| `16:07:32.755` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: PARTIAL, approved_amount: 8000.0, confidence: 1.00. |
 
 **Final explanation:** Decision: PARTIAL. Claim partially approved. Excluded line items: 'Teeth Whitening' (₹4,000.00). Approved: ₹8,000.00. Final approved amount: ₹8,000.00 (no co-pay). Confidence score: 1.00.
 
@@ -242,18 +243,18 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP007', category 'DIAGNOSTIC', amount ₹15,000.00. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription, lab report and hospital bill present for DIAGNOSTIC claim. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.099` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 3 document(s) accepted for DIAGNOSTIC claim. |
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 3 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP007' (Suresh Patil) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-11-02 is in range. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Suspected Lumbar Disc Herniation'. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-11-02). No specific condition waiting period applies. |
-| `15:14:05.099` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | 'MRI' detected in claim (amount ₹15,000 > pre-auth threshold ₹10,000). Pre-authorization is required for this test but was not provided. To resubmit: obtain a pre-authorization reference from your insurer before the procedure and include it with your claim. |
-| `15:14:05.099` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=1.00). 'MRI' detected in claim (amount ₹15,000 > pre-auth threshold ₹10,000). Pre-authorization is required for this test but w |
-| `15:14:05.099` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 1.00. |
+| `16:07:32.756` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP007', category 'DIAGNOSTIC', amount ₹15,000.00. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription, lab report and hospital bill present for DIAGNOSTIC claim. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 3 document(s) accepted for DIAGNOSTIC claim. |
+| `16:07:32.756` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 3 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP007' (Suresh Patil) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-11-02 is in range. |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Suspected Lumbar Disc Herniation'. |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-11-02). No specific condition waiting period applies. |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | 'MRI' detected in claim (amount ₹15,000 > pre-auth threshold ₹10,000). Pre-authorization is required for this test but was not provided. To resubmit: obtain a pre-authorization reference from your insurer before the procedure and include it with your claim. |
+| `16:07:32.756` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=1.00). 'MRI' detected in claim (amount ₹15,000 > pre-auth threshold ₹10,000). Pre-authorization is required for this test but w |
+| `16:07:32.756` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 1.00. |
 
 **Final explanation:** Decision: REJECTED. 'MRI' detected in claim (amount ₹15,000 > pre-auth threshold ₹10,000). Pre-authorization is required for this test but was not provided. To resubmit: obtain a pre-authorization reference from your insurer before the procedure and include it with your claim. Confidence score: 1.00.
 
@@ -279,21 +280,21 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP003', category 'CONSULTATION', amount ₹7,500.00. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP003' (Amit Verma) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-20 is in range. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Gastroenteritis'. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-10-20). No specific condition waiting period applies. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'CONSULTATION'. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for CONSULTATION: approved base amount ₹7,500.00 |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Approved amount ₹7,500 exceeds the per-claim limit of ₹5,000. The maximum reimbursable amount per claim is ₹5,000. |
-| `15:14:05.100` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=1.00). Approved amount ₹7,500 exceeds the per-claim limit of ₹5,000. The maximum reimbursable amount per claim is ₹5,000. |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 1.00. |
+| `16:07:32.756` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP003', category 'CONSULTATION', amount ₹7,500.00. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
+| `16:07:32.756` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP003' (Amit Verma) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-20 is in range. |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Gastroenteritis'. |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-10-20). No specific condition waiting period applies. |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'CONSULTATION'. |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for CONSULTATION: approved base amount ₹7,500.00 |
+| `16:07:32.756` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Approved amount ₹7,500 exceeds the per-claim limit of ₹5,000. The maximum reimbursable amount per claim is ₹5,000. |
+| `16:07:32.756` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=1.00). Approved amount ₹7,500 exceeds the per-claim limit of ₹5,000. The maximum reimbursable amount per claim is ₹5,000. |
+| `16:07:32.756` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 1.00. |
 
 **Final explanation:** Decision: REJECTED. Approved amount ₹7,500 exceeds the per-claim limit of ₹5,000. The maximum reimbursable amount per claim is ₹5,000. Confidence score: 1.00.
 
@@ -323,22 +324,22 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP008', category 'CONSULTATION', amount ₹4,800.00. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP008' (Ravi Menon) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-30 is in range. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Migraine'. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-10-30). No specific condition waiting period applies. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'CONSULTATION'. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Fraud signals detected: 4 claims submitted on 2024-10-30 (including this one), exceeds same-day limit of 2. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for CONSULTATION: approved base amount ₹4,800.00 |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Approved amount ₹4,800 is within the per-claim limit of ₹5,000. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹4,800.00 → co-pay 10% (₹480.00) → final ₹4,320.00 |
-| `15:14:05.100` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: MANUAL_REVIEW (confidence=1.00). Claim flagged for manual review due to fraud signals: 4 claims submitted on 2024-10-30 (including this one), exceeds sam |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: MANUAL_REVIEW, approved_amount: None, confidence: 1.00. |
+| `16:07:32.756` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP008', category 'CONSULTATION', amount ₹4,800.00. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.756` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP008' (Ravi Menon) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-30 is in range. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Migraine'. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-10-30). No specific condition waiting period applies. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'CONSULTATION'. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Fraud signals detected: 4 claims submitted on 2024-10-30 (including this one), exceeds same-day limit of 2. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for CONSULTATION: approved base amount ₹4,800.00 |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Approved amount ₹4,800 is within the per-claim limit of ₹5,000. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹4,800.00 → co-pay 10% (₹480.00) → final ₹4,320.00 |
+| `16:07:32.757` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: MANUAL_REVIEW (confidence=1.00). Claim flagged for manual review due to fraud signals: 4 claims submitted on 2024-10-30 (including this one), exceeds sam |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: MANUAL_REVIEW, approved_amount: None, confidence: 1.00. |
 
 **Final explanation:** Decision: MANUAL_REVIEW. Claim flagged for manual review due to fraud signals: 4 claims submitted on 2024-10-30 (including this one), exceeds same-day limit of 2. Confidence score: 1.00.
 
@@ -369,22 +370,22 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP010', category 'CONSULTATION', amount ₹4,500.00. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP010' (Deepak Shah) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-11-03 is in range. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Acute Bronchitis'. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-11-03). No specific condition waiting period applies. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'CONSULTATION'. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for CONSULTATION: approved base amount ₹4,500.00 |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Approved amount ₹4,500 is within the per-claim limit of ₹5,000. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹4,500.00 → network discount 20% → ₹3,600.00 → co-pay 10% (₹360.00) → final ₹3,240.00 |
-| `15:14:05.100` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: APPROVED (confidence=1.00). Claim approved for ₹3,240.00. Network discount of 20.0% applied (₹4,500.00 → ₹3,600.00). Co-pay of 10.0% (₹360.00) deduc |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: APPROVED, approved_amount: 3240.0, confidence: 1.00. |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP010', category 'CONSULTATION', amount ₹4,500.00. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP010' (Deepak Shah) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-11-03 is in range. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Acute Bronchitis'. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-11-03). No specific condition waiting period applies. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'CONSULTATION'. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for CONSULTATION: approved base amount ₹4,500.00 |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Approved amount ₹4,500 is within the per-claim limit of ₹5,000. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹4,500.00 → network discount 20% → ₹3,600.00 → co-pay 10% (₹360.00) → final ₹3,240.00 |
+| `16:07:32.757` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: APPROVED (confidence=1.00). Claim approved for ₹3,240.00. Network discount of 20.0% applied (₹4,500.00 → ₹3,600.00). Co-pay of 10.0% (₹360.00) deduc |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: APPROVED, approved_amount: 3240.0, confidence: 1.00. |
 
 **Final explanation:** Decision: APPROVED. Claim approved for ₹3,240.00. Network discount of 20.0% applied (₹4,500.00 → ₹3,600.00). Co-pay of 10.0% (₹360.00) deducted. Network discount 20.0% applied (₹4,500.00 → ₹3,600.00). Co-pay 10.0% deducted (₹360.00 → final ₹3,240.00). Confidence score: 1.00.
 
@@ -413,23 +414,23 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP006', category 'ALTERNATIVE_MEDICINE', amount ₹4,000.00. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for ALTERNATIVE_MEDICINE claim. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for ALTERNATIVE_MEDICINE claim. |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ⚠ `degraded` | simulate_component_failure active — first document 'F021' forced to degraded extraction. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP006' (Kavita Nair) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-28 is in range. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No diagnosis/treatment text available — exclusion check skipped. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-10-28). No specific condition waiting period applies. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'ALTERNATIVE_MEDICINE'. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for ALTERNATIVE_MEDICINE: approved base amount ₹4,000.00 |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Approved amount ₹4,000 is within the per-claim limit of ₹5,000. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹4,000.00 → no co-pay → final ₹4,000.00 |
-| `15:14:05.100` | `decision` | `DecisionAgent` | ⚠ `degraded` | Decision: APPROVED (confidence=0.70). Claim approved for ₹4,000.00. NOTE: One pipeline component was unavailable during processing. Manual review is recommend |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: APPROVED, approved_amount: 4000.0, confidence: 0.70. |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP006', category 'ALTERNATIVE_MEDICINE', amount ₹4,000.00. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for ALTERNATIVE_MEDICINE claim. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for ALTERNATIVE_MEDICINE claim. |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ⚠ `degraded` | simulate_component_failure active — first document 'F021' forced to degraded extraction. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP006' (Kavita Nair) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-28 is in range. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No diagnosis/treatment text available — exclusion check skipped. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-10-28). No specific condition waiting period applies. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'ALTERNATIVE_MEDICINE'. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for ALTERNATIVE_MEDICINE: approved base amount ₹4,000.00 |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Approved amount ₹4,000 is within the per-claim limit of ₹5,000. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹4,000.00 → no co-pay → final ₹4,000.00 |
+| `16:07:32.757` | `decision` | `DecisionAgent` | ⚠ `degraded` | Decision: APPROVED (confidence=0.70). Claim approved for ₹4,000.00. NOTE: One pipeline component was unavailable during processing. Manual review is recommend |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: APPROVED, approved_amount: 4000.0, confidence: 0.70. |
 
 **Final explanation:** Decision: APPROVED. Claim approved for ₹4,000.00. NOTE: One pipeline component was unavailable during processing. Manual review is recommended to verify this result. Confidence reductions: Component failure simulation active — confidence reduced by 0.3 Final approved amount: ₹4,000.00 (no co-pay). Confidence score: 0.70.
 
@@ -455,18 +456,183 @@ _Trace not available — pipeline stopped at document verification stage._
 
 | Time | Stage | Component | Status | Summary |
 |------|-------|-----------|--------|---------|
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP009', category 'CONSULTATION', amount ₹8,000.00. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
-| `15:14:05.100` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP009' (Anita Desai) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-18 is in range. |
-| `15:14:05.100` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Diagnosis/treatment matches excluded condition: 'Obesity and weight loss programs'. This treatment is not covered under the policy. |
-| `15:14:05.100` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=0.95). Diagnosis/treatment matches excluded condition: 'Obesity and weight loss programs'. This treatment is not covered under  |
-| `15:14:05.100` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 0.95. |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP009', category 'CONSULTATION', amount ₹8,000.00. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.757` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP009' (Anita Desai) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-10-18 is in range. |
+| `16:07:32.757` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Diagnosis/treatment matches excluded condition: 'Obesity and weight loss programs'. This treatment is not covered under the policy. |
+| `16:07:32.757` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=0.95). Diagnosis/treatment matches excluded condition: 'Obesity and weight loss programs'. This treatment is not covered under  |
+| `16:07:32.757` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 0.95. |
 
 **Final explanation:** Decision: REJECTED. Diagnosis/treatment matches excluded condition: 'Obesity and weight loss programs'. This treatment is not covered under the policy. Confidence score: 0.95.
+
+### Verdict: ✅ PASS
+
+---
+
+
+# Extra Cases (author-added)
+
+These cases are not part of `test_cases.json`. They cover behaviour that is implemented in the pipeline but not exercised by the core suite: the member-not-found path, the submission-rules stage (minimum amount and filing deadline), and vision line-item exclusion. See `eval/extra_cases.json` for the inputs.
+
+## Summary Table
+
+| Case ID | Name | Expected Decision | Actual Decision | Verdict |
+|---------|------|-------------------|-----------------|---------|
+| `EC001` | Member Not Found | `MANUAL_REVIEW` | `MANUAL_REVIEW` | ✅ PASS |
+| `EC002` | Below Minimum Claim Amount | `REJECTED` | `REJECTED` | ✅ PASS |
+| `EC003` | Vision Partial — LASIK Excluded | `PARTIAL` | `PARTIAL` | ✅ PASS |
+| `EC004` | Late Submission — Filing Deadline Exceeded | `REJECTED` | `REJECTED` | ✅ PASS |
+
+---
+
+## Per-Case Detail
+
+## 1. EC001 — Member Not Found
+
+**Description:** A valid-looking consultation claim, but the member_id is not in the policy roster. Documents are correct so verification passes; the member lookup is what fails.
+
+**Expected outcome:** decision=`MANUAL_REVIEW`, 
+
+### Actual Result
+
+**Decision:** 🔍 `MANUAL_REVIEW`
+**Approved amount:** —
+**Confidence score:** 0.5000
+**Rejection reasons:** —
+**Reason:** Member ID not found in policy records — requires manual verification.
+
+### Trace
+
+| Time | Stage | Component | Status | Summary |
+|------|-------|-----------|--------|---------|
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP999', category 'CONSULTATION', amount ₹1,500.00. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✗ `failed` | Member 'EMP999' not found in policy roster. Routing to MANUAL_REVIEW. |
+
+**Final explanation:** Member 'EMP999' is not present in the policy roster. This claim cannot be processed automatically and requires manual verification to confirm membership.
+
+### Verdict: ✅ PASS
+
+---
+
+## 2. EC002 — Below Minimum Claim Amount
+
+**Description:** A pharmacy claim for 300 rupees, below the policy minimum claimable amount of 500.
+
+**Expected outcome:** decision=`REJECTED`, , rejection_reasons=`['BELOW_MINIMUM_AMOUNT']`
+
+### Actual Result
+
+**Decision:** ❌ `REJECTED`
+**Approved amount:** —
+**Confidence score:** 1.0000
+**Rejection reasons:** ['BELOW_MINIMUM_AMOUNT']
+**Reason:** Rejected: Below Minimum Amount.
+
+### Trace
+
+| Time | Stage | Component | Status | Summary |
+|------|-------|-----------|--------|---------|
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP004', category 'PHARMACY', amount ₹300.00. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and pharmacy bill present for PHARMACY claim. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for PHARMACY claim. |
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Claimed amount ₹300 is below the minimum claimable amount of ₹500. |
+| `16:07:32.758` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=1.00). Rejected: Below Minimum Amount. |
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 1.00. |
+
+**Final explanation:** Decision: REJECTED. Rejected: Below Minimum Amount. Confidence score: 1.00.
+
+### Verdict: ✅ PASS
+
+---
+
+## 3. EC003 — Vision Partial — LASIK Excluded
+
+**Description:** A vision claim with a covered eye examination and an excluded LASIK procedure on the same bill. Only the eye examination should be approved.
+
+**Expected outcome:** decision=`PARTIAL`, approved_amount=`1000`
+
+### Actual Result
+
+**Decision:** 🔶 `PARTIAL`
+**Approved amount:** Rs1,000.00
+**Confidence score:** 1.0000
+**Rejection reasons:** —
+**Reason:** Claim partially approved. Excluded line items: 'LASIK Surgery' (₹4,000.00). Approved: ₹1,000.00.
+**Financial breakdown:**
+  - Base: Rs1,000.00
+  - **Final: Rs1,000.00**
+**Line items:**
+  - ✓ `Eye Examination` Rs1,000.00 — Covered under opd_categories.vision.covered_items.
+  - ✗ `LASIK Surgery` Rs4,000.00 — 'LASIK Surgery' is excluded under opd_categories.vision.excluded_items.
+
+### Trace
+
+| Time | Stage | Component | Status | Summary |
+|------|-------|-----------|--------|---------|
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP002', category 'VISION', amount ₹5,000.00. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for VISION claim. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for VISION claim. |
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Member 'EMP002' (Priya Singh) found. Policy 'PLUM_GHI_2024' is ACTIVE for 2024-04-01 – 2025-03-31. Treatment date 2024-11-05 is in range. |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No global exclusions matched for diagnosis: 'Myopia'. |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Initial waiting period passed (joined 2024-04-01, earliest 2024-05-01, treatment 2024-11-05). No specific condition waiting period applies. |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Pre-auth check not applicable for category 'VISION'. |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | No fraud signals detected. |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Coverage evaluated for VISION: approved base amount ₹1,000.00 (sub_limit ₹5,000 applied). 1 line item(s) excluded. |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Per-claim limit check skipped for VISION with line-item evaluation (sub_limit governs). |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✓ `ok` | Financial calculation: Base: ₹1,000.00 → no co-pay → final ₹1,000.00 |
+| `16:07:32.758` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: PARTIAL (confidence=1.00). Claim partially approved. Excluded line items: 'LASIK Surgery' (₹4,000.00). Approved: ₹1,000.00. |
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: PARTIAL, approved_amount: 1000.0, confidence: 1.00. |
+
+**Final explanation:** Decision: PARTIAL. Claim partially approved. Excluded line items: 'LASIK Surgery' (₹4,000.00). Approved: ₹1,000.00. Final approved amount: ₹1,000.00 (no co-pay). Confidence score: 1.00.
+
+### Verdict: ✅ PASS
+
+---
+
+## 4. EC004 — Late Submission — Filing Deadline Exceeded
+
+**Description:** A consultation treated on 2024-09-01 but submitted on 2024-11-01, which is more than 30 days after treatment.
+
+**Expected outcome:** decision=`REJECTED`, , rejection_reasons=`['SUBMISSION_DEADLINE_EXCEEDED']`
+
+### Actual Result
+
+**Decision:** ❌ `REJECTED`
+**Approved amount:** —
+**Confidence score:** 1.0000
+**Rejection reasons:** ['SUBMISSION_DEADLINE_EXCEEDED']
+**Reason:** Rejected: Submission Deadline Exceeded.
+
+### Trace
+
+| Time | Stage | Component | Status | Summary |
+|------|-------|-----------|--------|---------|
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline started for member 'EMP001', category 'CONSULTATION', amount ₹1,500.00. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Required document check passed: prescription and hospital bill present for CONSULTATION claim. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Legibility check passed: all documents are readable. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Patient identity check passed: no patient names on documents to compare. |
+| `16:07:32.758` | `document_verification` | `DocumentVerificationAgent` | ✓ `ok` | Document verification passed: 2 document(s) accepted for CONSULTATION claim. |
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Extraction skipped — 2 pre-extracted document(s) provided directly (eval harness / test injection). |
+| `16:07:32.758` | `policy_evaluation` | `PolicyEvaluationAgent` | ✗ `failed` | Claim submitted on 2024-11-01, which is more than 30 days after treatment date 2024-09-01 (deadline: 2024-10-01). |
+| `16:07:32.758` | `decision` | `DecisionAgent` | ✓ `ok` | Decision: REJECTED (confidence=1.00). Rejected: Submission Deadline Exceeded. |
+| `16:07:32.758` | `orchestrator` | `ClaimOrchestrator` | ✓ `ok` | Pipeline complete — decision: REJECTED, approved_amount: None, confidence: 1.00. |
+
+**Final explanation:** Decision: REJECTED. Rejected: Submission Deadline Exceeded. Confidence score: 1.00.
 
 ### Verdict: ✅ PASS
 
