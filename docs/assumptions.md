@@ -107,15 +107,6 @@ in the trace/message; worth adding if ops feedback shows confusion between the t
 
 ---
 
-## Extraction model: claude-sonnet-4-5
-**Assumption:** `extraction_model = "claude-sonnet-4-5"` for all document extraction calls.
-
-**Why:** The claude-sonnet family is vision-capable, supports base64 image/PDF input, and handles tool-call forced output reliably. Sonnet gives better OCR accuracy on messy Indian medical documents (handwritten prescriptions, rubber-stamped text) than Haiku at a reasonable cost. The lighter `classification_model = "claude-haiku-4-5"` is reserved for cheap single-label classification tasks.
-
-**Would change:** Benchmark against claude-opus for difficult documents (heavily handwritten, multi-page PDFs) once real document samples are available.
-
----
-
 ## Extraction date field: import shadowing fix
 **Assumption:** `app/schemas/extraction.py` imports `datetime.date` as `date_type` (not `date`) to avoid a Pydantic v2 annotation resolution bug. When a field is named `date`, Pydantic resolves the class-level annotation `Optional[date]` in the class namespace where `date` refers to the field descriptor, not the `datetime.date` type, resolving to `NoneType`. Renaming the import to `date_type` fixes this without changing any external interface.
 

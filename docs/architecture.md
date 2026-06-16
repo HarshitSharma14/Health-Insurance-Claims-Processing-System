@@ -65,7 +65,7 @@ A `passed: false` result has `decision: null` — not `MANUAL_REVIEW`. This is a
 
 One call per document, run concurrently via `asyncio.gather(..., return_exceptions=True)`. Each call:
 - Sends the document as base64 image/PDF to a vision-capable Gemini model (`gemini-3.1-flash-lite`)
-- Uses forced tool-call output (Anthropic tool schema) matching `ExtractedDocumentData`
+- Uses Gemini's `response_schema` (forced structured JSON output) matching `ExtractedDocumentData`
 - Returns per-field confidence scores and an `is_partial` flag
 - On failure: one retry with exponential backoff, then returns a degraded result (`overall_confidence: 0.0`, `is_partial: True`) — never raises to the caller
 
@@ -222,7 +222,7 @@ Current: ~100 claims/day processed synchronously, in-memory state, single proces
 - **Python 3.12** is required. Python 3.14 (system default on this machine) has no `pydantic-core` wheels — document this prominently in setup instructions.
 - **Pydantic v2** annotation resolution: `from __future__ import annotations` is dropped from schema files to avoid Pydantic deferring type resolution at class construction time.
 - **`date` field shadowing**: `app/schemas/extraction.py` imports `datetime.date` as `date_type` to avoid a name collision with the `date` field on `ExtractedDocumentData`. This is the Pydantic v2-safe pattern.
-- **Test isolation**: all 132 tests run without live API calls. The Anthropic client is mocked in `test_extractor.py`. Policy evaluation and decision tests construct Pydantic model fixtures directly.
+- **Test isolation**: all 132 tests run without live API calls. The Gemini call (wrapped in `asyncio.to_thread`) is mocked in `test_extractor.py`. Policy evaluation and decision tests construct Pydantic model fixtures directly.
 
 ---
 
