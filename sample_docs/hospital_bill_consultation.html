@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hospital Bill – City Medical Centre</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #111;
+         background: #fff; width: 680px; padding: 0; }
+
+  .header { background: #1a3a6b; color: #fff; padding: 14px 20px 10px; }
+  .hosp-name { font-size: 20px; font-weight: bold; letter-spacing: 0.5px; }
+  .hosp-sub  { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+  .hosp-addr { font-size: 11px; opacity: 0.8; margin-top: 4px; }
+
+  .bill-title { background: #f0f4ff; padding: 8px 20px;
+                display: flex; justify-content: space-between; align-items: center;
+                border-bottom: 1px solid #c5cfe8; }
+  .bill-title .label { font-size: 15px; font-weight: bold; color: #1a3a6b;
+                        letter-spacing: 0.5px; }
+  .bill-title .meta  { font-size: 11px; color: #555; text-align: right; }
+
+  .patient-grid { display: grid; grid-template-columns: 1fr 1fr 1fr;
+                  border-bottom: 1px solid #ddd; }
+  .pg-cell { padding: 8px 14px; border-right: 1px solid #ddd; }
+  .pg-cell:last-child { border-right: none; }
+  .pg-cell label { font-size: 10px; color: #888; display: block;
+                   text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+  .pg-cell span  { font-size: 13px; font-weight: bold; }
+
+  .table-wrap { padding: 0 0 0 0; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #eef2ff; }
+  thead th { padding: 8px 14px; text-align: left; font-size: 11px;
+             text-transform: uppercase; letter-spacing: 0.4px; color: #1a3a6b;
+             border-bottom: 2px solid #c5cfe8; }
+  thead th.right { text-align: right; }
+  tbody td { padding: 7px 14px; font-size: 13px; border-bottom: 1px solid #eee; }
+  tbody td.right { text-align: right; }
+  tbody td.num { font-family: monospace; text-align: right; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr.subtotal td { background: #f9f9f9; font-weight: bold; }
+
+  .totals { border-top: 2px solid #1a3a6b; }
+  .total-row { display: flex; justify-content: space-between;
+               padding: 5px 14px; font-size: 13px; }
+  .total-row.grand { background: #1a3a6b; color: #fff; font-weight: bold;
+                     font-size: 14px; padding: 8px 14px; }
+  .total-row label { color: inherit; }
+  .total-row span  { font-family: monospace; }
+
+  .footer { padding: 12px 20px; display: flex; justify-content: space-between;
+            align-items: flex-end; border-top: 1px dashed #bbb; font-size: 11px; }
+  .footer .note { color: #666; max-width: 340px; line-height: 1.5; }
+  .footer .auth { text-align: right; }
+  .auth-line { border-top: 1px solid #333; width: 140px; margin-bottom: 4px;
+               margin-left: auto; }
+  .auth-name  { font-weight: bold; font-size: 12px; }
+  .auth-title { color: #666; }
+
+  .paid-stamp { position: relative; display: inline-block; margin-top: 6px; }
+  .paid-stamp span {
+    border: 3px solid #27ae60; color: #27ae60; font-weight: bold;
+    font-size: 13px; padding: 2px 10px; border-radius: 4px;
+    letter-spacing: 1px; transform: rotate(-5deg); display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ───────────────────────────────────────────── -->
+<div class="header">
+  <div class="hosp-name">CITY MEDICAL CENTRE</div>
+  <div class="hosp-sub">Multi-Specialty OPD &amp; Diagnostic Centre</div>
+  <div class="hosp-addr">
+    12 MG Road, Bengaluru – 560001 &nbsp;|&nbsp; Ph: +91-80-22001234
+    &nbsp;|&nbsp; GSTIN: 29AXXXX1234X1ZX
+  </div>
+</div>
+
+<!-- ── Bill title ────────────────────────────────────────── -->
+<div class="bill-title">
+  <div class="label">RECEIPT / TAX INVOICE</div>
+  <div class="meta">
+    <div>Bill No: CMC/2024/08321</div>
+    <div>Date: 01-Nov-2024</div>
+    <div>Time: 11:34 AM</div>
+  </div>
+</div>
+
+<!-- ── Patient details ──────────────────────────────────── -->
+<div class="patient-grid">
+  <div class="pg-cell">
+    <label>Patient Name</label>
+    <span>Rajesh Kumar</span>
+  </div>
+  <div class="pg-cell">
+    <label>Age / Sex</label>
+    <span>39 Yrs / Male</span>
+  </div>
+  <div class="pg-cell">
+    <label>Member ID</label>
+    <span>EMP001</span>
+  </div>
+  <div class="pg-cell">
+    <label>Ref. Doctor</label>
+    <span>Dr. Arun Sharma</span>
+  </div>
+  <div class="pg-cell">
+    <label>Insurer</label>
+    <span>Plum GHI 2024</span>
+  </div>
+  <div class="pg-cell">
+    <label>Visit Type</label>
+    <span>OPD Consultation</span>
+  </div>
+</div>
+
+<!-- ── Line items ────────────────────────────────────────── -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:30px">#</th>
+        <th>Description</th>
+        <th class="right" style="width:70px">Qty</th>
+        <th class="right" style="width:90px">Rate (₹)</th>
+        <th class="right" style="width:100px">Amount (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Consultation Fee (OPD) — Dr. Arun Sharma</td>
+        <td class="right">1</td>
+        <td class="num">1,000.00</td>
+        <td class="num">1,000.00</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>CBC — Complete Blood Count</td>
+        <td class="right">1</td>
+        <td class="num">300.00</td>
+        <td class="num">300.00</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Dengue NS1 Antigen Test</td>
+        <td class="right">1</td>
+        <td class="num">200.00</td>
+        <td class="num">200.00</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── Totals ────────────────────────────────────────────── -->
+<div class="totals">
+  <div class="total-row">
+    <label>Sub-total</label>
+    <span>₹ 1,500.00</span>
+  </div>
+  <div class="total-row">
+    <label>Discount</label>
+    <span>₹ 0.00</span>
+  </div>
+  <div class="total-row">
+    <label>GST (0% — healthcare exempt)</label>
+    <span>₹ 0.00</span>
+  </div>
+  <div class="total-row grand">
+    <label>TOTAL AMOUNT CHARGED</label>
+    <span>₹ 1,500.00</span>
+  </div>
+</div>
+
+<!-- ── Footer ───────────────────────────────────────────── -->
+<div class="footer">
+  <div>
+    <div class="note">
+      Amount in words: <strong>Rupees One Thousand Five Hundred Only</strong><br>
+      Mode of Payment: Insurance (Plum GHI 2024)<br>
+      This is a computer-generated receipt and is valid without signature.
+    </div>
+    <div class="paid-stamp"><span>PAID</span></div>
+  </div>
+  <div class="auth">
+    <div class="auth-line"></div>
+    <div class="auth-name">Authorised Signatory</div>
+    <div class="auth-title">City Medical Centre</div>
+    <div class="auth-title">Bengaluru – 560001</div>
+  </div>
+</div>
+
+</body>
+</html>

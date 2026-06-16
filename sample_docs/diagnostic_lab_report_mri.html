@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lab Report – MRI Lumbar Spine</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #111;
+         background: #fff; width: 680px; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 14px 20px 10px; border-bottom: 3px solid #6a1b9a; }
+  .lab-name { font-size: 20px; font-weight: bold; color: #6a1b9a; }
+  .lab-sub  { font-size: 11px; color: #555; margin-top: 2px; }
+  .lab-addr { font-size: 11px; color: #666; margin-top: 4px; }
+  .lab-cert { font-size: 10px; color: #888; margin-top: 2px; }
+  .accred   { text-align: right; font-size: 10px; color: #777; }
+
+  .report-banner { background: #f3e5f5; padding: 8px 20px;
+                   display: flex; justify-content: space-between; align-items: center;
+                   border-bottom: 1px solid #ce93d8; }
+  .report-banner .title { font-size: 14px; font-weight: bold; color: #6a1b9a; }
+  .report-banner .meta  { font-size: 11px; color: #555; text-align: right; }
+
+  .patient-strip { display: grid; grid-template-columns: 1fr 1fr 1fr;
+                   border-bottom: 1px solid #ddd; }
+  .pc { padding: 7px 14px; border-right: 1px solid #ddd; }
+  .pc:last-child { border-right: none; }
+  .pc label { font-size: 10px; text-transform: uppercase; color: #888;
+              letter-spacing: 0.4px; display: block; margin-bottom: 2px; }
+  .pc span  { font-size: 13px; font-weight: bold; }
+
+  .section { padding: 12px 20px; border-bottom: 1px solid #eee; }
+  .section h3 { font-size: 12px; text-transform: uppercase; color: #6a1b9a;
+                letter-spacing: 0.6px; margin-bottom: 8px; border-bottom: 1px dotted #ce93d8;
+                padding-bottom: 4px; }
+  .section p { font-size: 13px; line-height: 1.7; margin-bottom: 6px; }
+  .section p strong { color: #333; }
+
+  .impression { padding: 12px 20px; background: #f9f3ff; border-top: 2px solid #6a1b9a;
+                border-bottom: 2px solid #6a1b9a; }
+  .impression h3 { font-size: 12px; text-transform: uppercase; color: #6a1b9a;
+                   letter-spacing: 0.6px; margin-bottom: 8px; }
+  .impression ol { margin-left: 18px; }
+  .impression ol li { font-size: 13px; line-height: 1.7; font-weight: bold; }
+
+  .footer { padding: 12px 20px; display: flex; justify-content: space-between; font-size: 11px; }
+  .footer .note { color: #666; max-width: 320px; line-height: 1.5; }
+  .sig { text-align: right; }
+  .sig-line { border-top: 1px solid #333; width: 160px; margin: 0 0 4px auto; }
+  .sig-name  { font-weight: bold; font-size: 12px; }
+  .sig-title { color: #666; }
+  .barcode { font-family: monospace; font-size: 16px; letter-spacing: 6px;
+             color: #333; border: 1px solid #ddd; padding: 2px 8px; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ───────────────────────────────────────────── -->
+<div class="header">
+  <div>
+    <div class="lab-name">Apollo Diagnostics</div>
+    <div class="lab-sub">Advanced Imaging &amp; Pathology Centre</div>
+    <div class="lab-addr">
+      Outer Ring Road, Marathahalli, Bengaluru – 560037<br>
+      Ph: +91-80-43210000 &nbsp;|&nbsp; reports@apollodiag.in
+    </div>
+    <div class="lab-cert">
+      NABL Accredited (No: MC-2891) &nbsp;|&nbsp; NABH Certified
+    </div>
+  </div>
+  <div class="accred">
+    <div style="font-size:24px;">🔬</div>
+    <div>ISO 15189:2012</div>
+    <div>Certified Lab</div>
+  </div>
+</div>
+
+<!-- ── Report banner ────────────────────────────────────── -->
+<div class="report-banner">
+  <div class="title">RADIOLOGY REPORT — MRI LUMBAR SPINE</div>
+  <div class="meta">
+    <div>Report No: APD/MRI/2024/09341</div>
+    <div>Scan Date: 02-Nov-2024</div>
+    <div>Report Date: 02-Nov-2024</div>
+  </div>
+</div>
+
+<!-- ── Patient details ──────────────────────────────────── -->
+<div class="patient-strip">
+  <div class="pc">
+    <label>Patient Name</label>
+    <span>Suresh Patil</span>
+  </div>
+  <div class="pc">
+    <label>Age / Sex</label>
+    <span>49 Yrs / Male</span>
+  </div>
+  <div class="pc">
+    <label>Member ID</label>
+    <span>EMP007</span>
+  </div>
+  <div class="pc">
+    <label>Ref. Doctor</label>
+    <span>Dr. Venkat Rao</span>
+  </div>
+  <div class="pc">
+    <label>Reg. No</label>
+    <span>AP/67890/2017</span>
+  </div>
+  <div class="pc">
+    <label>Clinical Details</label>
+    <span>Low back pain, radiating to right leg</span>
+  </div>
+</div>
+
+<!-- ── Technique ────────────────────────────────────────── -->
+<div class="section">
+  <h3>Technique</h3>
+  <p>
+    MRI of the lumbar spine was performed on a 3.0 Tesla Siemens MAGNETOM Vida scanner.
+    Sequences: Sagittal T1W, T2W, STIR; Axial T2W at L3-S1 levels.
+    No contrast administered.
+  </p>
+</div>
+
+<!-- ── Findings ─────────────────────────────────────────── -->
+<div class="section">
+  <h3>Findings</h3>
+  <p><strong>Vertebral bodies:</strong> Normal height and signal intensity. No compression fracture or marrow edema.</p>
+  <p><strong>L3-L4:</strong> Mild disc desiccation. Minimal posterior disc bulge. No significant canal or foraminal stenosis.</p>
+  <p><strong>L4-L5:</strong> Moderate disc desiccation with posterior disc bulge and bilateral facet hypertrophy causing
+    mild bilateral neural foraminal narrowing. No significant central canal stenosis.</p>
+  <p>
+    <strong>L5-S1:</strong> <span style="color:#c0392b; font-weight:bold;">Broad-based posterior disc herniation
+    (approximately 5 mm protrusion)</span> causing <strong>moderate left lateral recess stenosis</strong> with
+    compression of the traversing left S1 nerve root. Mild right foraminal narrowing.
+  </p>
+  <p><strong>Posterior elements:</strong> No spondylolysis or spondylolisthesis. Facet joints show bilateral
+    hypertrophic changes at L4-L5 and L5-S1.</p>
+  <p><strong>Paraspinal soft tissues:</strong> Unremarkable.</p>
+  <p><strong>Conus medullaris:</strong> Terminates normally at L1 level.</p>
+</div>
+
+<!-- ── Impression ───────────────────────────────────────── -->
+<div class="impression">
+  <h3>Impression / Conclusion</h3>
+  <ol>
+    <li>L5-S1 broad-based posterior disc herniation with moderate left lateral recess stenosis
+      and compression of left S1 nerve root — consistent with Lumbar Disc Herniation.</li>
+    <li>L4-L5 posterior disc bulge with mild bilateral foraminal narrowing.</li>
+    <li>Multilevel lumbar spondylosis.</li>
+  </ol>
+  <p style="margin-top:8px; font-size:11px; color:#555;">
+    Clinical correlation recommended. Neurosurgery / Spine surgery referral advised if symptoms persist.
+  </p>
+</div>
+
+<!-- ── Footer ───────────────────────────────────────────── -->
+<div class="footer">
+  <div class="note">
+    <div>Test: <strong>MRI Lumbar Spine (without contrast)</strong></div>
+    <div>Amount Charged: <strong>₹ 15,000.00</strong></div>
+    <div style="margin-top:4px; color:#c0392b;">
+      ⚠ Pre-authorization required for MRI above ₹10,000. Please submit
+      pre-auth reference with your insurance claim.
+    </div>
+  </div>
+  <div class="sig">
+    <div class="barcode">||| |||| ||| ||</div>
+    <div style="margin-top:8px;" class="sig-line"></div>
+    <div class="sig-name">Dr. Pradeep Kulkarni</div>
+    <div class="sig-title">MD Radiodiagnosis, DNB</div>
+    <div class="sig-title">Apollo Diagnostics, Bengaluru</div>
+  </div>
+</div>
+
+</body>
+</html>

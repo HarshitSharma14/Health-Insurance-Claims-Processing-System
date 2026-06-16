@@ -40,3 +40,9 @@ Thumbs.db
 *.swp
 *.jpg
 *.png
+
+# Demo claim documents (synthetic — no real PII). Required by the Fill feature
+# and the sample-docs guide, so force-track them despite the *.jpg rule above.
+!sample_docs/*.jpg
+!frontend/public/*.jpg
+!frontend/public/casedocs/*.jpg

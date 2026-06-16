@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pharmacy Bill – MedPlus</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #111;
+         background: #fff; width: 680px; }
+
+  .header { background: #e8f5e9; border-bottom: 3px solid #2e7d32; padding: 12px 20px; }
+  .shop-name { font-size: 20px; font-weight: bold; color: #2e7d32; }
+  .shop-sub  { font-size: 11px; color: #555; margin-top: 2px; }
+  .shop-addr { font-size: 11px; color: #666; margin-top: 4px; }
+  .lic { font-size: 10px; color: #888; margin-top: 2px; }
+
+  .bill-hdr { display: flex; justify-content: space-between; padding: 8px 20px;
+              background: #f1f8e9; border-bottom: 1px solid #c5e1a5; }
+  .bill-hdr .label { font-weight: bold; font-size: 13px; color: #2e7d32; }
+  .bill-hdr .meta  { font-size: 11px; color: #555; text-align: right; }
+
+  .patient-strip { display: flex; border-bottom: 1px solid #ddd; }
+  .pc { padding: 7px 14px; border-right: 1px solid #ddd; flex: 1; }
+  .pc:last-child { border-right: none; }
+  .pc label { font-size: 10px; text-transform: uppercase; color: #888;
+              letter-spacing: 0.4px; display: block; margin-bottom: 2px; }
+  .pc span  { font-size: 13px; font-weight: bold; }
+
+  .rx-ref { padding: 6px 20px; background: #f9fbe7; font-size: 11px;
+            color: #555; border-bottom: 1px solid #e6ee9c; }
+  .rx-ref strong { color: #111; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #e8f5e9; }
+  thead th { padding: 7px 14px; font-size: 11px; text-transform: uppercase;
+             color: #2e7d32; letter-spacing: 0.4px; border-bottom: 2px solid #a5d6a7; }
+  thead th.r { text-align: right; }
+  tbody td { padding: 7px 14px; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+  tbody td.r { text-align: right; font-family: monospace; }
+  .generic-badge { font-size: 10px; background: #e8f5e9; border: 1px solid #81c784;
+                   color: #2e7d32; padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
+
+  .totals { border-top: 2px solid #2e7d32; }
+  .tr { display: flex; justify-content: space-between; padding: 5px 14px; font-size: 13px; }
+  .tr.grand { background: #2e7d32; color: #fff; font-weight: bold; font-size: 14px; padding: 8px 14px; }
+  .tr label { color: inherit; }
+  .tr span  { font-family: monospace; }
+
+  .footer { padding: 10px 20px; font-size: 11px; color: #666; border-top: 1px dashed #bbb; }
+  .warn { margin-top: 6px; padding: 5px 10px; background: #fff8e1;
+          border-left: 3px solid #fbc02d; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ───────────────────────────────────────────── -->
+<div class="header">
+  <div class="shop-name">MedPlus Pharmacy</div>
+  <div class="shop-sub">Authorised Retail Chemist — All Insurance Accepted</div>
+  <div class="shop-addr">Shop 4, Koramangala 5th Block, Bengaluru – 560034 &nbsp;|&nbsp; Ph: +91-80-40027654</div>
+  <div class="lic">Drug Licence No: KA-BLR-2019-DL-04521 &nbsp;|&nbsp; GSTIN: 29BXXXX5678X1ZX</div>
+</div>
+
+<!-- ── Bill header ──────────────────────────────────────── -->
+<div class="bill-hdr">
+  <div class="label">PHARMACY BILL / CASH MEMO</div>
+  <div class="meta">
+    <div>Bill No: MP/2024/KMG/19832</div>
+    <div>Date: 25-Oct-2024</div>
+    <div>Time: 3:18 PM</div>
+  </div>
+</div>
+
+<!-- ── Patient details ──────────────────────────────────── -->
+<div class="patient-strip">
+  <div class="pc" style="flex:2">
+    <label>Patient Name</label>
+    <span>Sneha Reddy</span>
+  </div>
+  <div class="pc">
+    <label>Age / Sex</label>
+    <span>32 Yrs / F</span>
+  </div>
+  <div class="pc">
+    <label>Member ID</label>
+    <span>EMP004</span>
+  </div>
+  <div class="pc">
+    <label>Policy</label>
+    <span>Plum GHI 2024</span>
+  </div>
+</div>
+
+<div class="rx-ref">
+  Prescription by: <strong>Dr. R. Nair, MBBS (Reg: KA/98765/2018)</strong>
+  &nbsp;|&nbsp; Prescription Date: <strong>25-Oct-2024</strong>
+  &nbsp;|&nbsp; Diagnosis: <strong>Acute Pharyngitis</strong>
+</div>
+
+<!-- ── Line items ────────────────────────────────────────── -->
+<table>
+  <thead>
+    <tr>
+      <th style="width:28px">#</th>
+      <th>Medicine / Product</th>
+      <th class="r" style="width:55px">Qty</th>
+      <th class="r" style="width:80px">MRP (₹)</th>
+      <th class="r" style="width:80px">Disc %</th>
+      <th class="r" style="width:90px">Amount (₹)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>
+        Amoxicillin 500mg Capsules (10s)
+        <span class="generic-badge">Generic</span>
+      </td>
+      <td class="r">1 strip</td>
+      <td class="r">120.00</td>
+      <td class="r">10%</td>
+      <td class="r">108.00</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>
+        Azithromycin 500mg Tablets (3s)
+        <span class="generic-badge">Generic</span>
+      </td>
+      <td class="r">1 strip</td>
+      <td class="r">85.00</td>
+      <td class="r">10%</td>
+      <td class="r">76.50</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Cetyl Pyridinium Chloride Gargle 100ml (Hexidine)</td>
+      <td class="r">1 bottle</td>
+      <td class="r">95.00</td>
+      <td class="r">5%</td>
+      <td class="r">90.25</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Paracetamol 650mg Tablets (15s)</td>
+      <td class="r">1 strip</td>
+      <td class="r">28.00</td>
+      <td class="r">10%</td>
+      <td class="r">25.20</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Vitamin C + Zinc Effervescent Tablets (15s)</td>
+      <td class="r">1 tube</td>
+      <td class="r">120.00</td>
+      <td class="r">5%</td>
+      <td class="r">114.00</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>ORS Powder Sachets (Electral) — Pack of 4</td>
+      <td class="r">1 pack</td>
+      <td class="r">48.00</td>
+      <td class="r">0%</td>
+      <td class="r">48.00</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ── Totals ────────────────────────────────────────────── -->
+<div class="totals">
+  <div class="tr">
+    <label>MRP Total</label>
+    <span>₹ 496.00</span>
+  </div>
+  <div class="tr">
+    <label>Total Discount</label>
+    <span>– ₹ 34.05</span>
+  </div>
+  <div class="tr grand">
+    <label>NET PAYABLE</label>
+    <span>₹ 461.95</span>
+  </div>
+</div>
+
+<!-- ── Footer ───────────────────────────────────────────── -->
+<div class="footer">
+  <div>Amount in words: <strong>Rupees Four Hundred Sixty-One and Ninety-Five Paise Only</strong></div>
+  <div>Mode of Payment: Insurance (Plum GHI 2024)</div>
+  <div class="warn">
+    ⚠ All medicines dispensed against valid prescription. Prescription retained at pharmacy.
+    A copy is available on request.
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prescription – Dr. Arun Sharma</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #111;
+         background: #fff; width: 680px; padding: 0; }
+
+  .header { border-bottom: 3px double #1a3a6b; padding: 14px 20px 10px; }
+  .doctor-name { font-size: 18px; font-weight: bold; color: #1a3a6b; letter-spacing: 0.3px; }
+  .doctor-quals { font-size: 12px; color: #333; margin-top: 2px; }
+  .doctor-reg  { font-size: 11px; color: #555; margin-top: 1px; }
+  .clinic-addr { font-size: 11px; color: #555; margin-top: 4px; }
+  .clinic-contact { font-size: 11px; color: #555; }
+
+  .patient-bar { display: flex; gap: 0; border-bottom: 1px solid #bbb; }
+  .patient-bar .cell { padding: 7px 12px; border-right: 1px solid #bbb; flex: 1; }
+  .patient-bar .cell:last-child { border-right: none; }
+  .cell label { font-size: 10px; color: #777; display: block; text-transform: uppercase;
+                letter-spacing: 0.5px; margin-bottom: 2px; }
+  .cell span  { font-size: 13px; font-weight: bold; }
+
+  .rx-body { padding: 14px 20px; }
+  .rx-title { font-size: 14px; font-weight: bold; color: #1a3a6b; margin-bottom: 8px;
+              border-bottom: 1px dashed #bbb; padding-bottom: 4px; }
+  .diag-row { margin-bottom: 12px; }
+  .diag-row label { font-size: 11px; color: #555; font-weight: bold; margin-right: 6px; }
+  .diag-row span  { font-size: 13px; }
+
+  .rx-symbol { font-size: 26px; color: #1a3a6b; font-style: italic; font-weight: bold;
+               float: left; line-height: 1; margin-right: 8px; margin-top: -2px; }
+  .medicines { margin-bottom: 14px; overflow: hidden; }
+  .med-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .med-table td { padding: 3px 6px; font-size: 12px; vertical-align: top; }
+  .med-table td:first-child { color: #1a3a6b; font-weight: bold; width: 24px; }
+  .med-name { font-weight: bold; }
+  .med-dose { color: #333; font-size: 11px; }
+
+  .investigations { margin-bottom: 14px; }
+  .investigations label { font-size: 11px; font-weight: bold; color: #555; }
+  .investigations ul { margin-top: 4px; margin-left: 16px; }
+  .investigations ul li { font-size: 12px; margin-bottom: 2px; }
+
+  .followup { font-size: 12px; color: #333; margin-bottom: 14px; }
+  .followup label { font-weight: bold; color: #555; }
+
+  .footer { border-top: 1px solid #bbb; padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: flex-end; }
+  .stamp { width: 90px; height: 90px; border: 2px solid #1a3a6b; border-radius: 50%;
+           display: flex; flex-direction: column; align-items: center; justify-content: center;
+           font-size: 8.5px; color: #1a3a6b; text-align: center; padding: 6px;
+           opacity: 0.85; transform: rotate(-8deg); }
+  .stamp .reg { font-weight: bold; font-size: 9px; margin-top: 2px; }
+  .sig-block { text-align: right; }
+  .sig-line { border-top: 1px solid #333; width: 150px; margin-bottom: 4px; }
+  .sig-name { font-size: 11px; font-weight: bold; }
+  .sig-title { font-size: 10px; color: #555; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────── -->
+<div class="header">
+  <div class="doctor-name">Dr. Arun Sharma</div>
+  <div class="doctor-quals">MBBS, MD (Internal Medicine), FCPS</div>
+  <div class="doctor-reg">Reg. No: KA/45678/2015 &nbsp;|&nbsp; MCI Certified</div>
+  <div style="margin-top:6px; display:flex; justify-content:space-between;">
+    <div>
+      <div class="clinic-addr">City Medical Centre, 12 MG Road, Bengaluru – 560001</div>
+      <div class="clinic-contact">Ph: +91-80-22001234 &nbsp;|&nbsp; Timing: 9 AM – 7 PM (Mon–Sat)</div>
+    </div>
+    <div style="text-align:right; font-size:11px; color:#555;">
+      <div>OPD Timings</div>
+      <div style="font-weight:bold; color:#1a3a6b;">9:00 AM – 1:00 PM</div>
+      <div style="font-weight:bold; color:#1a3a6b;">4:00 PM – 7:00 PM</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Patient bar ──────────────────────────────────────── -->
+<div class="patient-bar">
+  <div class="cell" style="flex:2.5">
+    <label>Patient Name</label>
+    <span>Rajesh Kumar</span>
+  </div>
+  <div class="cell">
+    <label>Date</label>
+    <span>01-Nov-2024</span>
+  </div>
+  <div class="cell">
+    <label>Age / Sex</label>
+    <span>39 Yrs / M</span>
+  </div>
+  <div class="cell">
+    <label>Member ID</label>
+    <span>EMP001</span>
+  </div>
+</div>
+
+<!-- ── Rx body ──────────────────────────────────────────── -->
+<div class="rx-body">
+
+  <div class="diag-row">
+    <label>Chief Complaint:</label>
+    <span>Fever since 3 days, body ache, mild headache</span>
+  </div>
+
+  <div class="diag-row">
+    <label>Diagnosis:</label>
+    <span style="font-weight:bold; color:#c0392b;">Viral Fever</span>
+    <span style="font-size:11px; color:#555;">&nbsp;(ICD-10: B34.9)</span>
+  </div>
+
+  <div class="diag-row">
+    <label>Vitals:</label>
+    <span>Temp: 102.4°F &nbsp;|&nbsp; BP: 118/76 mmHg &nbsp;|&nbsp; SpO₂: 98%</span>
+  </div>
+
+  <div class="medicines">
+    <div class="rx-symbol">℞</div>
+    <table class="med-table">
+      <tr>
+        <td>1.</td>
+        <td>
+          <div class="med-name">Tab. Paracetamol 650 mg</div>
+          <div class="med-dose">1-1-1 &nbsp;×&nbsp; 5 days &nbsp;(after food)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>2.</td>
+        <td>
+          <div class="med-name">Tab. Vitamin C 500 mg</div>
+          <div class="med-dose">0-0-1 &nbsp;×&nbsp; 7 days</div>
+        </td>
+      </tr>
+      <tr>
+        <td>3.</td>
+        <td>
+          <div class="med-name">Tab. Cetirizine 10 mg <span style="font-size:10px; color:#888;">(if nasal congestion)</span></div>
+          <div class="med-dose">0-0-1 &nbsp;×&nbsp; 3 days</div>
+        </td>
+      </tr>
+      <tr>
+        <td>4.</td>
+        <td>
+          <div class="med-name">ORS Sachets</div>
+          <div class="med-dose">1 sachet in 1L water — drink throughout the day</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="investigations">
+    <label>Investigations Advised:</label>
+    <ul>
+      <li>CBC (Complete Blood Count)</li>
+      <li>Dengue NS1 Antigen Test</li>
+    </ul>
+  </div>
+
+  <div class="followup">
+    <label>Follow-up:</label> After 5 days if no improvement, or immediately if temp &gt; 103°F.
+  </div>
+
+  <div style="font-size:11px; color:#555; font-style:italic;">
+    General advice: Plenty of fluids, rest, avoid cold foods.
+  </div>
+
+</div>
+
+<!-- ── Footer ───────────────────────────────────────────── -->
+<div class="footer">
+  <div class="stamp">
+    <div>CITY MEDICAL</div>
+    <div>CENTRE</div>
+    <div class="reg">Dr. A. SHARMA</div>
+    <div>KA/45678/2015</div>
+    <div>BENGALURU</div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-line"></div>
+    <div class="sig-name">Dr. Arun Sharma</div>
+    <div class="sig-title">MBBS, MD (Internal Medicine)</div>
+    <div class="sig-title">City Medical Centre, Bengaluru</div>
+  </div>
+</div>
+
+</body>
+</html>

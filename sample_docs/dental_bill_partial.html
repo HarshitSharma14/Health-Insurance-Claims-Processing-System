@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dental Bill – Smile Dental Clinic</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #111;
+         background: #fff; width: 680px; }
+
+  .header { padding: 16px 20px 12px; border-bottom: 3px solid #2e86ab; display: flex;
+            justify-content: space-between; align-items: flex-start; }
+  .clinic-name { font-size: 22px; font-weight: bold; color: #2e86ab; }
+  .clinic-sub  { font-size: 11px; color: #555; margin-top: 2px; }
+  .clinic-addr { font-size: 11px; color: #666; margin-top: 4px; }
+  .logo-area { text-align: right; }
+  .tooth-icon { font-size: 36px; }
+
+  .bill-banner { background: #f0f8ff; padding: 7px 20px;
+                 display: flex; justify-content: space-between; align-items: center;
+                 border-bottom: 1px solid #c9e4f0; }
+  .bill-banner .label { font-weight: bold; font-size: 14px; color: #2e86ab; }
+  .bill-banner .meta  { font-size: 11px; color: #555; text-align: right; }
+
+  .patient-strip { display: flex; border-bottom: 1px solid #ddd; }
+  .ps-cell { padding: 8px 14px; border-right: 1px solid #ddd; flex: 1; }
+  .ps-cell:last-child { border-right: none; }
+  .ps-cell label { font-size: 10px; text-transform: uppercase; color: #888;
+                   letter-spacing: 0.4px; display: block; margin-bottom: 2px; }
+  .ps-cell span  { font-size: 13px; font-weight: bold; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #e8f4fb; }
+  thead th { padding: 8px 14px; text-align: left; font-size: 11px;
+             text-transform: uppercase; color: #2e86ab; letter-spacing: 0.4px;
+             border-bottom: 2px solid #c9e4f0; }
+  thead th.right { text-align: right; }
+  tbody td { padding: 8px 14px; border-bottom: 1px solid #eee; font-size: 13px; }
+  tbody td.right { text-align: right; font-family: monospace; }
+  tr.excluded { background: #fff5f5; }
+  tr.excluded td { color: #c0392b; }
+  tr.excluded .badge { font-size: 10px; background: #fde8e8; border: 1px solid #e57373;
+                        color: #c0392b; padding: 1px 6px; border-radius: 10px;
+                        margin-left: 6px; font-weight: normal; }
+  tr.covered td { }
+  tr.covered .badge { font-size: 10px; background: #e8f5e9; border: 1px solid #81c784;
+                       color: #2e7d32; padding: 1px 6px; border-radius: 10px;
+                       margin-left: 6px; }
+
+  .totals { border-top: 2px solid #2e86ab; }
+  .t-row { display: flex; justify-content: space-between; padding: 5px 14px; font-size: 13px; }
+  .t-row.strike { color: #c0392b; }
+  .t-row.grand  { background: #2e86ab; color: #fff; font-weight: bold; font-size: 14px;
+                   padding: 8px 14px; }
+  .t-row label  { color: inherit; }
+  .t-row span   { font-family: monospace; }
+
+  .footer { padding: 12px 20px; font-size: 11px; color: #666; border-top: 1px dashed #bbb; }
+  .footer strong { color: #111; }
+  .insurer-note { margin-top: 6px; padding: 6px 10px; background: #fff8e1;
+                  border-left: 3px solid #f9a825; font-size: 11px; color: #555; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ───────────────────────────────────────────── -->
+<div class="header">
+  <div>
+    <div class="clinic-name">Smile Dental Clinic</div>
+    <div class="clinic-sub">BDS, MDS — Cosmetic &amp; Restorative Dentistry</div>
+    <div class="clinic-addr">
+      34 Indiranagar, 12th Main, Bengaluru – 560038<br>
+      Ph: +91-80-41234567 &nbsp;|&nbsp; Reg. No: KA/DENT/2018/0124
+    </div>
+  </div>
+  <div class="logo-area"><div class="tooth-icon">🦷</div></div>
+</div>
+
+<!-- ── Bill banner ──────────────────────────────────────── -->
+<div class="bill-banner">
+  <div class="label">DENTAL TREATMENT BILL</div>
+  <div class="meta">
+    <div>Bill No: SDC/2024/04471</div>
+    <div>Date: 15-Oct-2024</div>
+  </div>
+</div>
+
+<!-- ── Patient details ──────────────────────────────────── -->
+<div class="patient-strip">
+  <div class="ps-cell" style="flex:2">
+    <label>Patient Name</label>
+    <span>Priya Singh</span>
+  </div>
+  <div class="ps-cell">
+    <label>Age / Sex</label>
+    <span>34 Yrs / F</span>
+  </div>
+  <div class="ps-cell">
+    <label>Member ID</label>
+    <span>EMP002</span>
+  </div>
+  <div class="ps-cell">
+    <label>Policy</label>
+    <span>Plum GHI 2024</span>
+  </div>
+</div>
+
+<!-- ── Line items ────────────────────────────────────────── -->
+<table>
+  <thead>
+    <tr>
+      <th style="width:28px">#</th>
+      <th>Procedure / Description</th>
+      <th class="right" style="width:60px">Tooth</th>
+      <th class="right" style="width:100px">Amount (₹)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="covered">
+      <td>1</td>
+      <td>
+        Root Canal Treatment (RCT) — 3 sittings
+        <span class="badge">✓ Covered</span>
+      </td>
+      <td class="right">#26</td>
+      <td class="right">8,000.00</td>
+    </tr>
+    <tr class="excluded">
+      <td>2</td>
+      <td>
+        Teeth Whitening (Bleaching) — full arch
+        <span class="badge">✗ Cosmetic</span>
+      </td>
+      <td class="right">All</td>
+      <td class="right">4,000.00</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ── Totals ────────────────────────────────────────────── -->
+<div class="totals">
+  <div class="t-row">
+    <label>Sub-total (all procedures)</label>
+    <span>₹ 12,000.00</span>
+  </div>
+  <div class="t-row strike">
+    <label>Less: Cosmetic / excluded procedures</label>
+    <span>– ₹ 4,000.00</span>
+  </div>
+  <div class="t-row">
+    <label>Covered amount (eligible for insurance)</label>
+    <span>₹ 8,000.00</span>
+  </div>
+  <div class="t-row grand">
+    <label>TOTAL BILLED</label>
+    <span>₹ 12,000.00</span>
+  </div>
+</div>
+
+<!-- ── Footer ───────────────────────────────────────────── -->
+<div class="footer">
+  <div>Total in words: <strong>Rupees Twelve Thousand Only</strong></div>
+  <div class="insurer-note">
+    <strong>Insurance note:</strong> Teeth Whitening is a cosmetic procedure and is
+    excluded under Plum GHI 2024 policy. Claim amount submitted to insurer:
+    <strong>₹ 8,000.00</strong> (Root Canal Treatment only).
+  </div>
+  <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+    <div style="text-align:right;">
+      <div style="border-top:1px solid #333; width:150px; margin-bottom:4px;"></div>
+      <div style="font-weight:bold;">Dr. Meena Pillai, BDS, MDS</div>
+      <div style="color:#666;">Smile Dental Clinic, Bengaluru</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
