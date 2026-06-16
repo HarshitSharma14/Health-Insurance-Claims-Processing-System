@@ -1,0 +1,17 @@
+# Render blueprint for the FastAPI backend.
+# Deploy: Render dashboard -> New -> Blueprint -> point at this repo.
+services:
+  - type: web
+    name: plum-claims-api
+    runtime: python
+    plan: free
+    rootDir: .
+    buildCommand: pip install -r requirements.txt
+    # $PORT is injected by Render. policy_terms.json is loaded from repo root at startup.
+    startCommand: uvicorn app.api.routes:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false   # set this in the Render dashboard, never commit it
+      - key: PYTHON_VERSION
+        value: "3.11.9"

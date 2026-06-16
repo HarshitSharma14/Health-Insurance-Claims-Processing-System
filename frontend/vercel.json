@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/claims", "destination": "https://YOUR-RENDER-SERVICE.onrender.com/claims" },
+    { "source": "/claims/(.*)", "destination": "https://YOUR-RENDER-SERVICE.onrender.com/claims/$1" },
+    { "source": "/health", "destination": "https://YOUR-RENDER-SERVICE.onrender.com/health" }
+  ]
+}
