@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, BookOpen } from "lucide-react";
 import { ClaimSubmissionForm } from "./components/ClaimSubmissionForm";
 import { DecisionView } from "./components/DecisionView";
+import { ReferencePanel } from "./components/ReferencePanel";
 import type { PipelineResponse } from "./types";
 import { DEMO_APPROVED, DEMO_REJECTED, DEMO_VERIFICATION_FAILURE, DEMO_PARTIAL } from "./demo-fixtures";
 
@@ -32,9 +33,11 @@ const FEATURES = [
 
 export default function App() {
   const [result, setResult] = useState<PipelineResponse | null>(getDemoResult);
+  const [refOpen, setRefOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-aubergine">
+      <ReferencePanel open={refOpen} onClose={() => setRefOpen(false)} />
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <header>
         <div className="max-w-7xl mx-auto px-6 lg:px-10 py-6 flex items-center justify-between">
@@ -53,15 +56,26 @@ export default function App() {
             </span>
           </div>
 
-          {result && (
+          <div className="flex items-center gap-5">
+            {result && (
+              <button
+                onClick={() => setResult(null)}
+                className="text-sm font-sans transition-opacity hover:opacity-100 opacity-70"
+                style={{ color: "#fff1e5" }}
+              >
+                ← New claim
+              </button>
+            )}
             <button
-              onClick={() => setResult(null)}
-              className="text-sm font-sans transition-opacity hover:opacity-100 opacity-70"
-              style={{ color: "#fff1e5" }}
+              onClick={() => setRefOpen(true)}
+              className="flex items-center gap-1.5 text-sm font-sans rounded-full px-3 py-1.5 transition-colors border"
+              style={{ color: "#fff1e5", borderColor: "rgba(255,241,229,0.25)" }}
+              title="Reviewer reference data — members, policy limits, how to trigger each outcome"
             >
-              ← New claim
+              <BookOpen size={14} />
+              Reference data
             </button>
-          )}
+          </div>
         </div>
       </header>
 

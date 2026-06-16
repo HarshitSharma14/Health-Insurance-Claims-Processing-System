@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
 import {
-  Loader2, Stethoscope, FlaskConical, Pill, Smile, Eye, Leaf, CheckCircle2, Building2,
+  Loader2, Stethoscope, FlaskConical, Pill, Smile, Eye, Leaf, CheckCircle2, Building2, Play, FileText,
 } from "lucide-react";
 import type { PipelineResponse } from "../types";
-import { TEST_CASES, TC_DESCRIPTIONS } from "../test-cases";
+import { TEST_CASES, TC_DESCRIPTIONS, TC_EXPECTED, FILL_DOCS } from "../test-cases";
 import { LoadingStages } from "./LoadingStages";
 import { DocumentSlots, buildSlots, transitionSlots, type SlotState } from "./DocumentSlots";
 
@@ -73,10 +73,16 @@ interface Props { onResult: (result: PipelineResponse) => void; }
 
 export function ClaimSubmissionForm({ onResult }: Props) {
   const [loading,       setLoading]       = useState(false);
+  const [memberId,      setMemberId]      = useState("");
+  const [policyId,      setPolicyId]      = useState("PLUM_GHI_2024");
+  const [treatmentDate, setTreatmentDate] = useState("2024-11-01");
+  const [claimedAmount, setClaimedAmount] = useState("");
   const [category,      setCategory]      = useState<CategoryValue | "">("");
   const [slots,         setSlots]         = useState<SlotState[]>([]);
   const [hospitalInput, setHospitalInput] = useState("");
   const [hospitalOpen,  setHospitalOpen]  = useState(false);
+  const [loadedCase,    setLoadedCase]    = useState<string | null>(null);
+  const [loadedDocs,    setLoadedDocs]    = useState<{ type: string; file: File; name: string }[]>([]);
   const [amountError,   setAmountError]   = useState<string | null>(null);
   const [dateError,     setDateError]     = useState<string | null>(null);
   const [submitError,   setSubmitError]   = useState<string | null>(null);
@@ -96,6 +102,7 @@ export function ClaimSubmissionForm({ onResult }: Props) {
   const handleCategoryChange = (val: CategoryValue) => {
     setCatError(null);
     setDocError(null);
+    setLoadedCase(null);  // manual category change → leave loaded-case mode
     if (category === val) return;
     if (category === "") {
       setSlots(buildSlots(val));
@@ -141,43 +148,27 @@ export function ClaimSubmissionForm({ onResult }: Props) {
     let hasError = false;
     if (!category) { setCatError("Select a claim category."); hasError = true; } else setCatError(null);
 
-    // Check all required slots have files and no unconfirmed stale warnings
-    const requiredEmpty = slots.filter(s => s.required && !s.file);
-    const staleUnconfirmed = slots.filter(s => s.file && s.staleType && !s.confirmed);
-    if (requiredEmpty.length > 0) {
-      setDocError(`Upload required: ${requiredEmpty.map(s => s.docType.replace(/_/g, " ").toLowerCase()).join(", ")}`);
-      hasError = true;
-    } else if (staleUnconfirmed.length > 0) {
-      setDocError("Confirm or remove re-assigned documents before submitting.");
-      hasError = true;
+    // Loaded cases carry their own attached document set, so they skip slot
+    // validation. Manual claims validate the upload slots.
+    if (!loadedCase) {
+      const requiredEmpty = slots.filter(s => s.required && !s.file);
+      const staleUnconfirmed = slots.filter(s => s.file && s.staleType && !s.confirmed);
+      if (requiredEmpty.length > 0) {
+        setDocError(`Upload required: ${requiredEmpty.map(s => s.docType.replace(/_/g, " ").toLowerCase()).join(", ")}`);
+        hasError = true;
+      } else if (staleUnconfirmed.length > 0) {
+        setDocError("Confirm or remove re-assigned documents before submitting.");
+        hasError = true;
+      } else setDocError(null);
     } else setDocError(null);
 
     if (hasError) return;
     setSubmitError(null);
     setLoading(true);
 
-    const form = e.currentTarget;
-    const fd   = new FormData();
-    const get  = (n: string) => (form.elements.namedItem(n) as HTMLInputElement).value;
-    fd.append("member_id",      get("member_id"));
-    fd.append("policy_id",      get("policy_id"));
-    fd.append("claim_category", category);
-    fd.append("treatment_date", get("treatment_date"));
-    fd.append("claimed_amount", get("claimed_amount"));
-    if (hospitalInput) fd.append("hospital_name", hospitalInput);
-
-    // Append files in slot order with declared document_type_{i}
-    let fileIdx = 0;
-    for (const slot of slots) {
-      if (slot.file) {
-        fd.append("files", slot.file);
-        fd.append(`document_type_${fileIdx}`, slot.docType);
-        fileIdx++;
-      }
-    }
-
     try {
-      const res  = await fetch("/claims", { method: "POST", body: fd });
+      // Both paths hit the real pipeline (multipart → live LLM extraction).
+      const res = loadedCase ? await submitLoaded(loadedCase) : await submitManual();
       const json = await res.json();
       if (!res.ok) { setSubmitError(json.detail ?? `Error ${res.status}`); setLoading(false); return; }
       onResult(json as PipelineResponse);
@@ -187,17 +178,99 @@ export function ClaimSubmissionForm({ onResult }: Props) {
     }
   };
 
-  // ── TC quick-loader ────────────────────────────────────────────────────────
+  // Loaded case — submit the attached per-case documents to the live pipeline,
+  // passing through claims_history (TC009) and simulate_component_failure (TC011).
+  const submitLoaded = (caseId: string): Promise<Response> => {
+    const tc = TEST_CASES[caseId];
+    const fd = new FormData();
+    fd.append("member_id",      memberId);
+    fd.append("policy_id",      policyId);
+    fd.append("claim_category", category);
+    fd.append("treatment_date", treatmentDate);
+    fd.append("submission_date", treatmentDate);
+    fd.append("claimed_amount", claimedAmount || String(tc?.claimed_amount ?? ""));
+    if (hospitalInput) fd.append("hospital_name", hospitalInput);
+    if (tc?.simulate_component_failure) fd.append("simulate_component_failure", "true");
+    if (tc?.claims_history?.length) fd.append("claims_history_json", JSON.stringify(tc.claims_history));
+    loadedDocs.forEach((d, i) => {
+      fd.append("files", d.file);
+      fd.append(`document_type_${i}`, d.type);
+    });
+    return fetch("/claims", { method: "POST", body: fd });
+  };
+
+  // Manual claim — multipart form with the files the user attached to slots.
+  const submitManual = (): Promise<Response> => {
+    const fd = new FormData();
+    fd.append("member_id",      memberId);
+    fd.append("policy_id",      policyId);
+    fd.append("claim_category", category);
+    fd.append("treatment_date", treatmentDate);
+    // File promptly: submission date = treatment date, so the 30-day filing
+    // deadline check always passes on the happy path.
+    fd.append("submission_date", treatmentDate);
+    fd.append("claimed_amount", claimedAmount);
+    if (hospitalInput) fd.append("hospital_name", hospitalInput);
+
+    let fileIdx = 0;
+    for (const slot of slots) {
+      if (slot.file) {
+        fd.append("files", slot.file);
+        fd.append(`document_type_${fileIdx}`, slot.docType);
+        fileIdx++;
+      }
+    }
+    return fetch("/claims", { method: "POST", body: fd });
+  };
+
+  // ── Load a test case into the form (does NOT submit) ─────────────────────────
+  // Fills the fields AND fetches this case's matching sample documents so the
+  // live LLM pipeline runs against scenario-correct images on Submit.
+
+  const loadTestCase = async (caseId: string) => {
+    const tc = TEST_CASES[caseId];
+    if (!tc) return;
+
+    setMemberId(tc.member_id);
+    setPolicyId(tc.policy_id);
+    setCategory(tc.claim_category as CategoryValue);
+    setSlots([]);  // loaded cases use their own attached doc set, not slots
+    setTreatmentDate(tc.treatment_date);
+    setClaimedAmount(String(tc.claimed_amount));
+    setHospitalInput(tc.hospital_name ?? "");
+    setLoadedCase(caseId);
+    setLoadedDocs([]);
+    setCatError(null); setDocError(null); setSubmitError(null);
+    setAmountError(null); setDateError(null);
+
+    const spec = FILL_DOCS[caseId] ?? [];
+    const fetched = await Promise.all(
+      spec.map(async ({ type, file }) => {
+        try {
+          const res = await fetch(`/${file}`);
+          if (!res.ok) return null;
+          const blob = await res.blob();
+          const name = file.split("/").pop() ?? file;
+          return { type, file: new File([blob], name, { type: "image/jpeg" }), name };
+        } catch {
+          return null;
+        }
+      })
+    );
+    setLoadedDocs(fetched.filter((d): d is { type: string; file: File; name: string } => d !== null));
+  };
+
+  // ── Run a test case immediately (no form fill, no LLM call) ──────────────────
+  // Submits straight from the canned test-case data so reviewers can demo all
+  // outcomes quickly without filling the form or hitting LLM rate limits.
 
   const runTestCase = async (caseId: string) => {
     const tc = TEST_CASES[caseId];
     if (!tc) return;
-    setLoading(true);
     setSubmitError(null);
-
-    const hasContent = tc.documents.some(d => d.content);
-
+    setLoading(true);
     try {
+      const hasContent = tc.documents.some(d => d.content);
       let res: Response;
       if (hasContent) {
         const body = {
@@ -224,6 +297,7 @@ export function ClaimSubmissionForm({ onResult }: Props) {
         fd.append("policy_id",      tc.policy_id);
         fd.append("claim_category", tc.claim_category);
         fd.append("treatment_date", tc.treatment_date);
+        fd.append("submission_date", tc.treatment_date);
         fd.append("claimed_amount", String(tc.claimed_amount));
         if (tc.hospital_name) fd.append("hospital_name", tc.hospital_name);
         tc.documents.forEach((doc, i) => {
@@ -234,7 +308,6 @@ export function ClaimSubmissionForm({ onResult }: Props) {
         });
         res = await fetch("/claims", { method: "POST", body: fd });
       }
-
       const json = await res.json();
       if (!res.ok) { setSubmitError(json.detail ?? `Error ${res.status}`); setLoading(false); return; }
       onResult(json as PipelineResponse);
@@ -260,7 +333,8 @@ export function ClaimSubmissionForm({ onResult }: Props) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelCls}>Member ID <span className="text-coral">*</span></label>
-            <input name="member_id" type="text" required className={inputCls} placeholder="EMP001" />
+            <input name="member_id" type="text" required className={inputCls} placeholder="EMP001"
+              value={memberId} onChange={e => setMemberId(e.target.value)} />
           </div>
           <div>
             <label className={labelCls}>
@@ -270,7 +344,7 @@ export function ClaimSubmissionForm({ onResult }: Props) {
               </span>
             </label>
             <input name="policy_id" type="text" required className={inputCls}
-              defaultValue="PLUM_GHI_2024" placeholder="PLUM_GHI_2024" />
+              value={policyId} onChange={e => setPolicyId(e.target.value)} placeholder="PLUM_GHI_2024" />
           </div>
         </div>
       </div>
@@ -312,13 +386,19 @@ export function ClaimSubmissionForm({ onResult }: Props) {
           <div>
             <label className={labelCls}>Treatment Date <span className="text-coral">*</span></label>
             <input name="treatment_date" type="date" required className={inputCls}
-              onBlur={handleDateBlur} max={new Date().toISOString().split("T")[0]} />
+              value={treatmentDate} onChange={e => setTreatmentDate(e.target.value)}
+              onBlur={handleDateBlur} min="2024-04-01" max="2025-03-31" />
+            <p className="text-[10px] text-ink-muted mt-1 font-sans">
+              Policy active 2024-04-01 → 2025-03-31
+            </p>
             {dateError && <p className="text-[11px] text-fail mt-1 font-sans">{dateError}</p>}
           </div>
           <div>
             <label className={labelCls}>Claimed Amount (₹) <span className="text-coral">*</span></label>
             <input name="claimed_amount" type="number" min={500} step="0.01" required
-              className={inputCls} placeholder="1500.00" onBlur={handleAmountBlur} />
+              className={inputCls} placeholder="1500.00"
+              value={claimedAmount} onChange={e => setClaimedAmount(e.target.value)}
+              onBlur={handleAmountBlur} />
             {amountError && <p className="text-[11px] text-fail mt-1 font-sans">{amountError}</p>}
           </div>
 
@@ -367,7 +447,37 @@ export function ClaimSubmissionForm({ onResult }: Props) {
       <div className="px-5 py-4 section-3">
         <SectionHeader>Documents <span className="text-coral">*</span></SectionHeader>
 
-        {category ? (
+        {loadedCase ? (
+          <div>
+            <p className="text-[11px] text-ink-muted font-sans mb-2">
+              {loadedDocs.length} document(s) auto-attached for{" "}
+              <span className="font-mono text-ink">{loadedCase}</span> — these are sent to the
+              live LLM pipeline on Submit.
+            </p>
+            <div className="space-y-1.5">
+              {loadedDocs.map((d, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-2 rounded border border-border bg-paper">
+                  <FileText size={11} className="text-ink-muted flex-shrink-0" />
+                  <span className="font-mono text-[10px] text-ink">{d.type.replace(/_/g, " ")}</span>
+                  <span className="font-mono text-xs text-ink-light flex-1 truncate">{d.name}</span>
+                  <span className="text-[10px] text-ink-muted tabular flex-shrink-0">
+                    {(d.file.size / 1024).toFixed(0)} KB
+                  </span>
+                </div>
+              ))}
+              {loadedDocs.length === 0 && (
+                <p className="text-[11px] text-fail font-sans">
+                  Could not load sample documents — is the dev server serving /casedocs?
+                </p>
+              )}
+            </div>
+            <button type="button"
+              onClick={() => { setLoadedCase(null); setLoadedDocs([]); setSlots(category ? buildSlots(category) : []); }}
+              className="text-[10px] font-sans text-coral hover:underline mt-2">
+              Clear &amp; upload manually
+            </button>
+          </div>
+        ) : category ? (
           <DocumentSlots
             category={category}
             slots={slots}
@@ -397,14 +507,20 @@ export function ClaimSubmissionForm({ onResult }: Props) {
         </button>
       </div>
 
-      <DevPanel onRun={runTestCase} />
+      <DevPanel onLoad={loadTestCase} onRun={runTestCase} loadedId={loadedCase} />
     </form>
   );
 }
 
 // ── Dev panel ─────────────────────────────────────────────────────────────────
 
-function DevPanel({ onRun }: { onRun: (id: string) => void }) {
+function DevPanel({
+  onLoad, onRun, loadedId,
+}: {
+  onLoad: (id: string) => Promise<void>;
+  onRun: (id: string) => void;
+  loadedId: string | null;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <div className="px-5 py-3 border-t border-dashed border-border-strong">
@@ -416,26 +532,95 @@ function DevPanel({ onRun }: { onRun: (id: string) => void }) {
       </button>
       {open && (
         <div className="mt-3">
-          <p className="text-[10px] text-ink-muted font-sans mb-2">
-            Load a test case and auto-submit. TC001-TC003 use placeholder images with declared types;
-            TC004-TC012 use pre-extracted content (no LLM calls).
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {Object.keys(TEST_CASES).map(id => (
-              <button key={id} type="button" onClick={() => onRun(id)} title={TC_DESCRIPTIONS[id]}
-                className="font-mono text-[10px] px-2 py-1 rounded border border-border-strong
-                  text-ink-muted bg-paper hover:border-aubergine hover:text-ink transition-colors">
-                {id}
-              </button>
-            ))}
+          <div className="rounded border border-border bg-surface px-2.5 py-2 mb-3">
+            <p className="text-[10px] text-ink font-sans leading-relaxed">
+              <span className="font-mono font-semibold text-coral">Run</span> = instant deterministic
+              result (no LLM). <span className="font-mono font-semibold text-aubergine">Fill</span> =
+              loads the fields + attaches scenario-matching sample documents, then Submit runs the
+              <span className="font-medium"> live LLM</span> pipeline.
+            </p>
+            <p className="text-[10px] text-ink-muted font-sans leading-relaxed mt-1">
+              Both paths reproduce the expected outcome below for every case. Fill needs a
+              <span className="font-mono"> GEMINI_API_KEY</span>; since extraction is probabilistic,
+              an amount could occasionally read slightly differently — Run is the guaranteed path.
+            </p>
           </div>
-          <div className="mt-2 space-y-0.5">
-            {Object.entries(TC_DESCRIPTIONS).map(([id, desc]) => (
-              <p key={id} className="text-[10px] text-ink-muted font-sans">
-                <span className="font-mono">{id}</span> — {desc}
+
+          {([
+            { label: "Required test cases (TC001–TC012)", ids: Object.keys(TEST_CASES).filter(k => k.startsWith("TC")) },
+            { label: "Extra cases — additional rules", ids: Object.keys(TEST_CASES).filter(k => k.startsWith("EX")) },
+          ] as { label: string; ids: string[] }[]).map(({ label, ids }) => (
+            <div key={label} className="mb-4">
+              <p className="text-[10px] font-semibold text-ink uppercase tracking-wide
+                            border-b border-border pb-1 mb-2">
+                {label}
               </p>
-            ))}
-          </div>
+              <div className="space-y-1.5">
+                {ids.map(id => {
+                  const exp = TC_EXPECTED[id];
+                  const decisionColor: Record<string, string> = {
+                    APPROVED: "text-ok",
+                    PARTIAL: "text-warn",
+                    REJECTED: "text-fail",
+                    MANUAL_REVIEW: "text-ink-muted",
+                    verification_failure: "text-coral",
+                  };
+                  return (
+                    <div key={id} className="rounded border border-border bg-surface p-2">
+                      <div className="flex items-start gap-2">
+                        {/* ID + actions */}
+                        <div className="flex flex-col gap-1 flex-shrink-0 pt-0.5">
+                          <span className={[
+                            "font-mono text-[10px] font-semibold",
+                            loadedId === id ? "text-aubergine" : "text-ink",
+                          ].join(" ")}>{id}</span>
+                          <div className="flex gap-1">
+                            <button type="button" onClick={() => onLoad(id)}
+                              className={[
+                                "font-sans text-[9px] px-1.5 py-0.5 rounded border transition-colors",
+                                loadedId === id
+                                  ? "border-aubergine bg-aubergine text-cream"
+                                  : "border-border-strong text-ink-muted bg-paper hover:border-aubergine hover:text-ink",
+                              ].join(" ")}>
+                              Fill
+                            </button>
+                            <button type="button" onClick={() => onRun(id)}
+                              className="font-sans text-[9px] px-1.5 py-0.5 rounded border
+                                border-border-strong text-ink-muted bg-paper
+                                hover:border-coral hover:text-coral transition-colors
+                                flex items-center gap-0.5">
+                              <Play size={8} /> Run
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Scenario + expected */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] text-ink font-sans leading-snug">
+                            {TC_DESCRIPTIONS[id]}
+                          </p>
+                          {exp && (
+                            <div className="mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                              <span className="text-[9px] font-mono text-ink-muted">Run →</span>
+                              <span className={`text-[10px] font-mono font-bold ${decisionColor[exp.decision] ?? "text-ink"}`}>
+                                {exp.decision === "verification_failure" ? "STOPS EARLY" : exp.decision}
+                              </span>
+                              {exp.approved_amount && (
+                                <span className="text-[10px] font-mono text-ok">{exp.approved_amount}</span>
+                              )}
+                              <span className="text-[10px] text-ink-muted font-sans leading-snug">
+                                — {exp.reason}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
