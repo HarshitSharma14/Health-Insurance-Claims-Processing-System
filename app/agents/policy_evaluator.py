@@ -634,11 +634,11 @@ def _stage7_sub_limit_and_line_items(
                             f"opd_categories.dental.covered_procedures."
                         ),
                     ))
-            approved = min(covered_total, sub_limit) if sub_limit else covered_total
+            approved = covered_total
 
         else:
-            # No line items extracted — use full claimed amount
-            approved = min(submission.claimed_amount, sub_limit) if sub_limit else submission.claimed_amount
+            # No line items extracted — use full claimed amount (cap applied in stage 8)
+            approved = submission.claimed_amount
 
     # VISION — line-item covered/excluded check
     elif submission.claim_category == ClaimCategory.VISION:
@@ -669,9 +669,9 @@ def _stage7_sub_limit_and_line_items(
                         description=desc, amount=amt, covered=True,
                         reason="Covered under opd_categories.vision.covered_items.",
                     ))
-            approved = min(covered_total, sub_limit) if sub_limit else covered_total
+            approved = covered_total
         else:
-            approved = min(submission.claimed_amount, sub_limit) if sub_limit else submission.claimed_amount
+            approved = submission.claimed_amount
 
     else:
         # All other categories: pass claimed_amount through.
@@ -714,13 +714,16 @@ def _stage8_financial_calculation(
     cat_network_discount_pct: float = cat_policy.get("network_discount_percent", 0.0)
     network_hospitals: list[str] = policy.get("network_hospitals", [])
 
-    # Determine sub_limit cap (already applied in stage 7 for dental/vision;
-    # here we record the metadata)
+    # Sub_limit cap. For line-item categories (DENTAL/VISION) the sub_limit is a
+    # true ceiling on the covered amount — apply it here and record the cap so
+    # the Decision Agent can mark the claim PARTIAL. For other categories the
+    # sub_limit is a per-procedure cap, not a claim ceiling (see assumptions.md),
+    # so the per_claim_limit (Stage 5) governs and we don't cap here.
+    LINE_ITEM_CATEGORIES = {"dental", "vision"}
     amount_after_sub_limit = base_amount
     sub_limit_applied: float | None = None
-    if sub_limit and base_amount > sub_limit:
-        # This path would have been applied in stage 7 for dental/vision;
-        # for other categories we record it but don't re-apply
+    if sub_limit and cat_key in LINE_ITEM_CATEGORIES and base_amount > sub_limit:
+        amount_after_sub_limit = sub_limit
         sub_limit_applied = sub_limit
 
     # Network hospital discount
