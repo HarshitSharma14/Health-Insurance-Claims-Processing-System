@@ -9,8 +9,8 @@ doesn't have to dig through the repo to find each piece.
    rebuild any one of them without reading the code.
 4. `04-eval-report.md` walks through all 12 test cases, what the system decided, and
    whether it matched.
-5. `05-demo-video.md` is the outline I used for the recording, kept here so you can
-   follow along with the video.
 
 The full machine-generated eval output, including every raw trace, lives in
 `../eval/eval_report.md`. The shorter version in this folder is the readable summary.
+
+The demo video is recorded separately and is not part of this folder.
