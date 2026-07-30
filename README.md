@@ -1,5 +1,8 @@
 # Plum Health Insurance Claims Processing System
 
+[![Tests](https://github.com/HarshitSharma14/Health-Insurance-Claims-Processing-System/actions/workflows/tests.yml/badge.svg)](https://github.com/HarshitSharma14/Health-Insurance-Claims-Processing-System/actions/workflows/tests.yml)
+
+
 Automated multi-agent pipeline for processing employee health insurance claims.
 Produces APPROVED / PARTIAL / REJECTED / MANUAL_REVIEW decisions with a full processing trace.
 
